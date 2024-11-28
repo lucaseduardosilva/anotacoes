@@ -260,6 +260,7 @@
       }
 
       async function editNote(noteId) {
+        console.log("lucx", noteId);
         const noteRef = doc(db, "notes", noteId);
         const noteSnapshot = await getDocs(noteRef);
         const note = noteSnapshot.data();
