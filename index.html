@@ -52,7 +52,7 @@
         th, td {
             border: 1px solid #dee2e6;
             padding: 12px;
-            text-align: center; /* Centraliza o texto das células */
+            text-align: center;
         }
         th {
             background-color: #007BFF;
@@ -149,115 +149,141 @@
     </div>
     <div id="overlay"></div>
 
-    <script>
-        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+      import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        const noteForm = document.getElementById('note-form');
-        const notesList = document.getElementById('notes-list');
-        const modal = document.getElementById('modal');
-        const editForm = document.getElementById('edit-form');
-        const cancelEditBtn = document.getElementById('cancel-edit');
-        const overlay = document.getElementById('overlay');
-        const searchInput = document.getElementById('search-input');
-        const deleteAllBtn = document.getElementById('delete-all-btn');
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCbHOwmCPDJkoopcN_vHVRLYc7kejmYgTc",
+        authDomain: "anotations-4c948.firebaseapp.com",
+        projectId: "anotations-4c948",
+        storageBucket: "anotations-4c948.firebasestorage.app",
+        messagingSenderId: "940884295975",
+        appId: "1:940884295975:web:c4cdda7c8cd8ecf868e902",
+        measurementId: "G-52EK5Q3PFF"
+      };
 
-        function renderNotes(filteredNotes = notes) {
-            notesList.innerHTML = '';
-            filteredNotes.forEach((note, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${note.title}</td>
-                    <td>${note.description}</td>
-                    <td>
-                        <button onclick="editNote(${index})">Editar</button>
-                        <button onclick="confirmDelete(${index})">Excluir</button>
-                    </td>
-                `;
-                notesList.appendChild(row);
-            });
-        }
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-        function addNote() {
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            notes.push({ title, description });
-            localStorage.setItem('notes', JSON.stringify(notes));
-            renderNotes();
-            noteForm.reset();
-        }
+      const noteForm = document.getElementById('note-form');
+      const notesList = document.getElementById('notes-list');
+      const modal = document.getElementById('modal');
+      const editForm = document.getElementById('edit-form');
+      const cancelEditBtn = document.getElementById('cancel-edit');
+      const overlay = document.getElementById('overlay');
+      const searchInput = document.getElementById('search-input');
+      const deleteAllBtn = document.getElementById('delete-all-btn');
 
-        function editNote(index) {
-            const note = notes[index];
-            document.getElementById('edit-id').value = index;
-            document.getElementById('edit-title').value = note.title;
-            document.getElementById('edit-description').value = note.description;
-            modal.classList.add('active');
-            overlay.classList.add('active');
-        }
-
-        function saveEdit() {
-            const index = document.getElementById('edit-id').value;
-            const title = document.getElementById('edit-title').value;
-            const description = document.getElementById('edit-description').value;
-            notes[index] = { title, description };
-            localStorage.setItem('notes', JSON.stringify(notes));
-            renderNotes();
-            modal.classList.remove('active');
-            overlay.classList.remove('active');
-        }
-
-        function confirmDelete(index) {
-            if (confirm("Você tem certeza que deseja excluir esta anotação?")) {
-                deleteNote(index);
-            }
-        }
-
-        function deleteNote(index) {
-            notes.splice(index, 1);
-            localStorage.setItem('notes', JSON.stringify(notes));
-            renderNotes();
-        }
-
-        function confirmDeleteAll() {
-            if (confirm("Você tem certeza que deseja excluir todas as anotações?")) {
-                deleteAllNotes();
-            }
-        }
-
-        function deleteAllNotes() {
-            notes = [];
-            localStorage.setItem('notes', JSON.stringify(notes));
-            renderNotes();
-        }
-
-        function searchNotes() {
-            const query = searchInput.value.toLowerCase();
-            const filteredNotes = notes.filter(note => 
-                note.title.toLowerCase().includes(query) || 
-                note.description.toLowerCase().includes(query)
-            );
-            renderNotes(filteredNotes);
-        }
-
-        noteForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            addNote();
+      // Função para renderizar as notas
+      async function renderNotes(filteredNotes = []) {
+        notesList.innerHTML = '';
+        filteredNotes.forEach((note) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${note.title}</td>
+            <td>${note.description}</td>
+            <td>
+              <button onclick="editNote('${note.id}')">Editar</button>
+              <button onclick="deleteNote('${note.id}')">Excluir</button>
+            </td>
+          `;
+          notesList.appendChild(row);
         });
+      }
 
-        editForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveEdit();
+      // Função para adicionar nota no Firestore
+      async function addNote() {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        try {
+          await addDoc(collection(db, "notes"), {
+            title: title,
+            description: description,
+          });
+          renderNotes();
+          noteForm.reset();
+        } catch (error) {
+          console.error("Erro ao adicionar nota: ", error);
+        }
+      }
+
+      // Função para editar nota
+      async function editNote(noteId) {
+        const noteRef = doc(db, "notes", noteId);
+        const noteSnapshot = await getDocs(noteRef);
+        const note = noteSnapshot.data();
+        document.getElementById('edit-id').value = noteId;
+        document.getElementById('edit-title').value = note.title;
+        document.getElementById('edit-description').value = note.description;
+        modal.classList.add('active');
+        overlay.classList.add('active');
+      }
+
+      // Função para salvar edição de nota
+      async function saveEdit() {
+        const noteId = document.getElementById('edit-id').value;
+        const title = document.getElementById('edit-title').value;
+        const description = document.getElementById('edit-description').value;
+        const noteRef = doc(db, "notes", noteId);
+        try {
+          await updateDoc(noteRef, { title, description });
+          modal.classList.remove('active');
+          overlay.classList.remove('active');
+          renderNotes();
+        } catch (error) {
+          console.error("Erro ao editar nota: ", error);
+        }
+      }
+
+      // Função para excluir nota
+      async function deleteNote(noteId) {
+        const noteRef = doc(db, "notes", noteId);
+        try {
+          await deleteDoc(noteRef);
+          renderNotes();
+        } catch (error) {
+          console.error("Erro ao excluir nota: ", error);
+        }
+      }
+
+      // Função para excluir todas as notas
+      async function deleteAllNotes() {
+        const notesSnapshot = await getDocs(collection(db, "notes"));
+        notesSnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
         });
-
-        cancelEditBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-
-        searchInput.addEventListener('input', searchNotes);
-        deleteAllBtn.addEventListener('click', confirmDeleteAll);
-
         renderNotes();
+      }
+
+      // Event Listeners
+      noteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        addNote();
+      });
+
+      editForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveEdit();
+      });
+
+      cancelEditBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        overlay.classList.remove('active');
+      });
+
+      deleteAllBtn.addEventListener('click', deleteAllNotes);
+
+      searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        renderNotes(filteredNotes.filter(note => note.title.toLowerCase().includes(searchTerm) || note.description.toLowerCase().includes(searchTerm)));
+      });
+
+      // Inicializa a lista de notas
+      renderNotes();
     </script>
 </body>
 </html>
