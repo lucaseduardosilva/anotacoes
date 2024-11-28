@@ -145,6 +145,27 @@
       .success {
         color: #28a745;
       }
+      #login-error-counter {
+        font-size: 14px;
+        color: #ff6f61;
+        margin-top: 10px;
+      }
+      #toast {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        display: none;
+        z-index: 1000;
+      }
+      #toast.error {
+        background-color: #dc3545;
+      }
     </style>
   </head>
   <body>
@@ -155,9 +176,12 @@
       <h2>Digite a Senha</h2>
       <input type="password" id="password" placeholder="Senha" />
       <button id="login-btn">Entrar</button>
-      <p id="login-feedback"></p>
+      <p id="login-error-counter">Tentativas restantes: 3</p>
     </div>
     <div id="overlay"></div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
 
     <div id="content" style="display: none">
       <form id="note-form">
@@ -242,68 +266,72 @@
       const loginModal = document.getElementById("login-modal");
       const passwordInput = document.getElementById("password");
       const loginBtn = document.getElementById("login-btn");
-      const loginFeedback = document.getElementById("login-feedback");
+      const loginErrorCounter = document.getElementById("login-error-counter");
       const content = document.getElementById("content");
+      const toast = document.getElementById("toast");
 
       let attempts = 0;
       const correctPassword = "1234";
 
-      function showLoginFeedback(success) {
-        loginFeedback.style.display = "block";
-        loginFeedback.textContent = success
-          ? "Login bem-sucedido!"
-          : "Senha incorreta!";
-        loginFeedback.className = success ? "success" : "error";
+      function showToast(message, isError = false) {
+        toast.textContent = message;
+        toast.className = isError ? "error" : "";
+        toast.style.display = "block";
         setTimeout(() => {
-          loginFeedback.style.display = "none";
+          toast.style.display = "none";
         }, 3000);
       }
 
+      function showLoginFeedback(success) {
+        if (success) {
+          showToast("Login bem-sucedido!");
+          content.style.display = "block";
+        } else {
+          showToast("Senha incorreta, tente novamente.", true);
+        }
+      }
+
       loginBtn.addEventListener("click", () => {
-        const enteredPassword = passwordInput.value;
-        if (enteredPassword === correctPassword) {
-          showLoginFeedback(true);
+        const password = passwordInput.value;
+        if (password === correctPassword) {
           loginModal.classList.remove("active");
           overlay.classList.remove("active");
-          content.style.display = "block";
-          attempts = 0;
+          showLoginFeedback(true);
         } else {
           attempts++;
+          loginErrorCounter.textContent = `Tentativas restantes: ${
+            3 - attempts
+          }`;
           showLoginFeedback(false);
           if (attempts >= 3) {
             loginModal.classList.remove("active");
             overlay.classList.remove("active");
-            attempts = 0;
+            showToast("Número máximo de tentativas atingido.", true);
           }
         }
       });
 
-      async function renderNotes(searchTerm = "") {
-        const notesSnapshot = await getDocs(collection(db, "notes"));
-        const notes = notesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      cancelEditBtn.addEventListener("click", () => {
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+      });
 
+      async function renderNotes(searchTerm = "") {
         notesList.innerHTML = "";
-        notes
-          .filter(
-            (note) =>
-              note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              note.description.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .forEach((note) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
+        const querySnapshot = await getDocs(collection(db, "notes"));
+        querySnapshot.forEach((doc) => {
+          const note = doc.data();
+          const row = document.createElement("tr");
+          row.innerHTML = `
             <td>${note.title}</td>
             <td>${note.description}</td>
             <td>
-              <button onclick="editNote('${note.id}')">Editar</button>
-              <button onclick="deleteNote('${note.id}')">Excluir</button>
+              <button onclick="editNote('${doc.id}')">Editar</button>
+              <button onclick="deleteNote('${doc.id}')">Excluir</button>
             </td>
           `;
-            notesList.appendChild(row);
-          });
+          notesList.appendChild(row);
+        });
       }
 
       async function addNote(title, description) {
@@ -325,11 +353,6 @@
         modal.classList.add("active");
         overlay.classList.add("active");
       }
-
-      cancelEditBtn.addEventListener("click", () => {
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-      });
 
       editForm.addEventListener("submit", async (e) => {
         e.preventDefault();
