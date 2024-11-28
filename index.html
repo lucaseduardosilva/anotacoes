@@ -9,32 +9,42 @@
       rel="stylesheet"
     />
     <style>
-      th {
-        text-align: center;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
+
       body {
         font-family: "Roboto", sans-serif;
         background-color: #f8f9fa;
         color: #333;
-        margin: 0;
         padding: 20px;
       }
+
       h1 {
         color: #007bff;
         text-align: center;
+        margin-bottom: 20px;
       }
+
       form {
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 10px;
         margin-bottom: 20px;
       }
+
       input,
       button {
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        width: 100%;
+        max-width: 300px;
       }
+
       button {
         background-color: #007bff;
         color: white;
@@ -42,9 +52,37 @@
         cursor: pointer;
         transition: background-color 0.3s;
       }
+
       button:hover {
         background-color: #0056b3;
       }
+
+      #search {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      #search input {
+        flex-grow: 1;
+      }
+
+      #delete-all-btn {
+        background-color: #dc3545;
+        border: none;
+        padding: 10px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #delete-all-btn:hover {
+        background-color: #c82333;
+      }
+
       table {
         width: 100%;
         max-width: 800px;
@@ -54,32 +92,35 @@
         background-color: #ffffff;
         table-layout: fixed;
       }
+
       th,
       td {
         border: 1px solid #dee2e6;
         padding: 12px;
         text-align: center;
       }
+
       th {
         background-color: #007bff;
         color: white;
       }
+
       td {
         background-color: #f8f9fa;
       }
-      td:nth-child(1) {
+
+      td:nth-child(1),
+      td:nth-child(2) {
         width: 230px;
         word-wrap: break-word;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      td:nth-child(2) {
-        width: 330px;
-        word-wrap: break-word;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      td:nth-child(3) {
+        width: 150px;
       }
+
       #modal {
         display: none;
         position: fixed;
@@ -92,9 +133,11 @@
         border-radius: 10px;
         z-index: 1000;
       }
+
       #modal.active {
         display: block;
       }
+
       #overlay {
         position: fixed;
         top: 0;
@@ -105,30 +148,34 @@
         display: none;
         z-index: 999;
       }
+
       #overlay.active {
         display: block;
       }
-      #search {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto 20px auto;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-      }
-      #search input {
-        flex-grow: 1;
-      }
-      #delete-all-btn {
-        background-color: #dc3545;
-        border: none;
-        padding: 10px;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      #delete-all-btn:hover {
-        background-color: #c82333;
+
+      @media (max-width: 600px) {
+        form {
+          flex-direction: column;
+        }
+
+        input,
+        button {
+          width: 100%;
+        }
+
+        #search {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        table {
+          font-size: 14px;
+        }
+
+        td:nth-child(1),
+        td:nth-child(2) {
+          width: auto;
+        }
       }
     </style>
   </head>
@@ -276,61 +323,53 @@
 
       async function editNote(noteId) {
         const noteRef = doc(db, "notes", noteId);
-        const noteSnapshot = await getDoc(noteRef);
-        const note = noteSnapshot.data();
+        const noteDoc = await getDoc(noteRef);
+        const note = noteDoc.data();
+
+        modal.classList.add("active");
+        overlay.classList.add("active");
+
         document.getElementById("edit-id").value = noteId;
         document.getElementById("edit-title").value = note.title;
         document.getElementById("edit-description").value = note.description;
-        modal.classList.add("active");
-        overlay.classList.add("active");
       }
 
-      async function saveEdit() {
+      async function updateNote() {
         const noteId = document.getElementById("edit-id").value;
         const title = document.getElementById("edit-title").value;
         const description = document.getElementById("edit-description").value;
+
         const noteRef = doc(db, "notes", noteId);
         try {
-          await updateDoc(noteRef, { title, description });
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
+          await updateDoc(noteRef, {
+            title,
+            description,
+          });
           renderNotes();
+          closeModal();
         } catch (error) {
-          console.error("Erro ao salvar edição: ", error);
+          console.error("Erro ao atualizar nota: ", error);
         }
       }
 
       async function deleteNote(noteId) {
-        const confirmDelete = window.confirm(
-          "Tem certeza que deseja excluir esta nota?"
-        );
-        if (confirmDelete) {
-          try {
-            await deleteDoc(doc(db, "notes", noteId));
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir nota: ", error);
-          }
+        const noteRef = doc(db, "notes", noteId);
+        try {
+          await deleteDoc(noteRef);
+          renderNotes();
+        } catch (error) {
+          console.error("Erro ao excluir nota: ", error);
         }
       }
 
       async function deleteAllNotes() {
-        const confirmDeleteAll = window.confirm(
-          "Tem certeza que deseja excluir todas as notas?"
-        );
-        if (confirmDeleteAll) {
-          const batch = writeBatch(db);
-          const notesSnapshot = await getDocs(collection(db, "notes"));
-          notesSnapshot.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
-          try {
-            await batch.commit();
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir todas as notas: ", error);
-          }
-        }
+        const batch = writeBatch(db);
+        const notesSnapshot = await getDocs(collection(db, "notes"));
+        notesSnapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+        renderNotes();
       }
 
       noteForm.addEventListener("submit", (e) => {
@@ -340,19 +379,29 @@
 
       editForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        saveEdit();
+        updateNote();
       });
 
-      cancelEditBtn.addEventListener("click", () => {
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
+      cancelEditBtn.addEventListener("click", (e) => {
+        closeModal();
+      });
+
+      overlay.addEventListener("click", () => {
+        closeModal();
       });
 
       searchInput.addEventListener("input", (e) => {
         renderNotes(e.target.value.toLowerCase());
       });
 
-      deleteAllBtn.addEventListener("click", deleteAllNotes);
+      deleteAllBtn.addEventListener("click", () => {
+        deleteAllNotes();
+      });
+
+      function closeModal() {
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+      }
 
       renderNotes();
     </script>
