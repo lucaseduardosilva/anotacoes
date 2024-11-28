@@ -301,35 +301,45 @@
       }
 
       async function deleteNote(noteId) {
-        const confirmDelete = window.confirm(
-          "Tem certeza que deseja excluir esta nota?"
-        );
-        if (confirmDelete) {
-          try {
-            await deleteDoc(doc(db, "notes", noteId));
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir nota: ", error);
+        const password = prompt("Digite a senha para confirmar a exclusão");
+        if (password === "1234") {
+          const confirmDelete = window.confirm(
+            "Tem certeza que deseja excluir esta nota?"
+          );
+          if (confirmDelete) {
+            try {
+              await deleteDoc(doc(db, "notes", noteId));
+              renderNotes();
+            } catch (error) {
+              console.error("Erro ao excluir nota: ", error);
+            }
           }
+        } else {
+          alert("Senha incorreta. A exclusão não será realizada.");
         }
       }
 
       async function deleteAllNotes() {
-        const confirmDeleteAll = window.confirm(
-          "Tem certeza que deseja excluir todas as notas?"
-        );
-        if (confirmDeleteAll) {
-          const batch = writeBatch(db);
-          const notesSnapshot = await getDocs(collection(db, "notes"));
-          notesSnapshot.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
-          try {
-            await batch.commit();
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir todas as notas: ", error);
+        const password = prompt("Digite a senha para confirmar a exclusão");
+        if (password === "1234") {
+          const confirmDeleteAll = window.confirm(
+            "Tem certeza que deseja excluir todas as notas?"
+          );
+          if (confirmDeleteAll) {
+            const batch = writeBatch(db);
+            const notesSnapshot = await getDocs(collection(db, "notes"));
+            notesSnapshot.docs.forEach((doc) => {
+              batch.delete(doc.ref);
+            });
+            try {
+              await batch.commit();
+              renderNotes();
+            } catch (error) {
+              console.error("Erro ao excluir todas as notas: ", error);
+            }
           }
+        } else {
+          alert("Senha incorreta. A exclusão não será realizada.");
         }
       }
 
