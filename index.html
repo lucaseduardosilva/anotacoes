@@ -80,7 +80,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      #modal {
+      #modal,
+      #login-modal {
         display: none;
         position: fixed;
         left: 50%;
@@ -92,7 +93,8 @@
         border-radius: 10px;
         z-index: 1000;
       }
-      #modal.active {
+      #modal.active,
+      #login-modal.active {
         display: block;
       }
       #overlay {
@@ -130,52 +132,76 @@
       #delete-all-btn:hover {
         background-color: #c82333;
       }
+      #login-feedback {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        padding: 5px;
+        font-weight: bold;
+      }
+      .error {
+        color: #dc3545;
+      }
+      .success {
+        color: #28a745;
+      }
     </style>
   </head>
   <body>
     <h1>Anotações</h1>
-    <form id="note-form">
-      <input type="text" id="title" placeholder="Título" required />
-      <input type="text" id="description" placeholder="Descrição" required />
-      <button type="submit">Adicionar</button>
-    </form>
 
-    <div id="search">
-      <input
-        type="text"
-        id="search-input"
-        placeholder="Buscar por título ou descrição"
-      />
-      <button id="delete-all-btn">Excluir Todas</button>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Descrição</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="notes-list"></tbody>
-    </table>
-
-    <div id="modal">
-      <h2>Editar Anotação</h2>
-      <form id="edit-form">
-        <input type="hidden" id="edit-id" />
-        <input type="text" id="edit-title" placeholder="Título" required />
-        <input
-          type="text"
-          id="edit-description"
-          placeholder="Descrição"
-          required
-        />
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancel-edit">Cancelar</button>
-      </form>
+    <!-- Login Modal -->
+    <div id="login-modal">
+      <h2>Digite a Senha</h2>
+      <input type="password" id="password" placeholder="Senha" />
+      <button id="login-btn">Entrar</button>
+      <p id="login-feedback"></p>
     </div>
     <div id="overlay"></div>
+
+    <div id="content" style="display: none">
+      <form id="note-form">
+        <input type="text" id="title" placeholder="Título" required />
+        <input type="text" id="description" placeholder="Descrição" required />
+        <button type="submit">Adicionar</button>
+      </form>
+
+      <div id="search">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Buscar por título ou descrição"
+        />
+        <button id="delete-all-btn">Excluir Todas</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descrição</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="notes-list"></tbody>
+      </table>
+
+      <div id="modal">
+        <h2>Editar Anotação</h2>
+        <form id="edit-form">
+          <input type="hidden" id="edit-id" />
+          <input type="text" id="edit-title" placeholder="Título" required />
+          <input
+            type="text"
+            id="edit-description"
+            placeholder="Descrição"
+            required
+          />
+          <button type="submit">Salvar</button>
+          <button type="button" id="cancel-edit">Cancelar</button>
+        </form>
+      </div>
+    </div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -213,6 +239,45 @@
       const searchInput = document.getElementById("search-input");
       const deleteAllBtn = document.getElementById("delete-all-btn");
 
+      const loginModal = document.getElementById("login-modal");
+      const passwordInput = document.getElementById("password");
+      const loginBtn = document.getElementById("login-btn");
+      const loginFeedback = document.getElementById("login-feedback");
+      const content = document.getElementById("content");
+
+      let attempts = 0;
+      const correctPassword = "1234";
+
+      function showLoginFeedback(success) {
+        loginFeedback.style.display = "block";
+        loginFeedback.textContent = success
+          ? "Login bem-sucedido!"
+          : "Senha incorreta!";
+        loginFeedback.className = success ? "success" : "error";
+        setTimeout(() => {
+          loginFeedback.style.display = "none";
+        }, 3000);
+      }
+
+      loginBtn.addEventListener("click", () => {
+        const enteredPassword = passwordInput.value;
+        if (enteredPassword === correctPassword) {
+          showLoginFeedback(true);
+          loginModal.classList.remove("active");
+          overlay.classList.remove("active");
+          content.style.display = "block";
+          attempts = 0;
+        } else {
+          attempts++;
+          showLoginFeedback(false);
+          if (attempts >= 3) {
+            loginModal.classList.remove("active");
+            overlay.classList.remove("active");
+            attempts = 0;
+          }
+        }
+      });
+
       async function renderNotes(searchTerm = "") {
         const notesSnapshot = await getDocs(collection(db, "notes"));
         const notes = notesSnapshot.docs.map((doc) => ({
@@ -222,137 +287,87 @@
 
         notesList.innerHTML = "";
         notes
-          .filter((note) => {
-            return (
-              note.title.toLowerCase().includes(searchTerm) ||
-              note.description.toLowerCase().includes(searchTerm)
-            );
-          })
+          .filter(
+            (note) =>
+              note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              note.description.toLowerCase().includes(searchTerm.toLowerCase())
+          )
           .forEach((note) => {
             const row = document.createElement("tr");
             row.innerHTML = `
             <td>${note.title}</td>
             <td>${note.description}</td>
             <td>
-              <button class="edit-btn" data-id="${note.id}">Editar</button>
-              <button class="delete-btn" data-id="${note.id}">Excluir</button>
+              <button onclick="editNote('${note.id}')">Editar</button>
+              <button onclick="deleteNote('${note.id}')">Excluir</button>
             </td>
           `;
             notesList.appendChild(row);
           });
-
-        const editBtns = document.querySelectorAll(".edit-btn");
-        const deleteBtns = document.querySelectorAll(".delete-btn");
-
-        editBtns.forEach((button) => {
-          button.addEventListener("click", (e) => {
-            const noteId = e.target.getAttribute("data-id");
-            editNote(noteId);
-          });
-        });
-
-        deleteBtns.forEach((button) => {
-          button.addEventListener("click", (e) => {
-            const noteId = e.target.getAttribute("data-id");
-            deleteNote(noteId);
-          });
-        });
       }
 
-      async function addNote() {
-        const title = document.getElementById("title").value;
-        const description = document.getElementById("description").value;
-        try {
-          await addDoc(collection(db, "notes"), {
-            title,
-            description,
-          });
-          renderNotes();
-          noteForm.reset();
-        } catch (error) {
-          console.error("Erro ao adicionar nota: ", error);
-        }
+      async function addNote(title, description) {
+        await addDoc(collection(db, "notes"), { title, description });
+        renderNotes();
       }
 
-      async function editNote(noteId) {
-        const noteRef = doc(db, "notes", noteId);
-        const noteSnapshot = await getDoc(noteRef);
-        const note = noteSnapshot.data();
-        document.getElementById("edit-id").value = noteId;
+      async function deleteNote(id) {
+        await deleteDoc(doc(db, "notes", id));
+        renderNotes();
+      }
+
+      async function editNote(id) {
+        const noteDoc = await getDoc(doc(db, "notes", id));
+        const note = noteDoc.data();
+        document.getElementById("edit-id").value = id;
         document.getElementById("edit-title").value = note.title;
         document.getElementById("edit-description").value = note.description;
         modal.classList.add("active");
         overlay.classList.add("active");
       }
 
-      async function saveEdit() {
-        const noteId = document.getElementById("edit-id").value;
-        const title = document.getElementById("edit-title").value;
-        const description = document.getElementById("edit-description").value;
-        const noteRef = doc(db, "notes", noteId);
-        try {
-          await updateDoc(noteRef, { title, description });
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
-          renderNotes();
-        } catch (error) {
-          console.error("Erro ao salvar edição: ", error);
-        }
-      }
-
-      async function deleteNote(noteId) {
-        const confirmDelete = window.confirm(
-          "Tem certeza que deseja excluir esta nota?"
-        );
-        if (confirmDelete) {
-          try {
-            await deleteDoc(doc(db, "notes", noteId));
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir nota: ", error);
-          }
-        }
-      }
-
-      async function deleteAllNotes() {
-        const confirmDeleteAll = window.confirm(
-          "Tem certeza que deseja excluir todas as notas?"
-        );
-        if (confirmDeleteAll) {
-          const batch = writeBatch(db);
-          const notesSnapshot = await getDocs(collection(db, "notes"));
-          notesSnapshot.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
-          try {
-            await batch.commit();
-            renderNotes();
-          } catch (error) {
-            console.error("Erro ao excluir todas as notas: ", error);
-          }
-        }
-      }
-
-      noteForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        addNote();
-      });
-
-      editForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        saveEdit();
-      });
-
       cancelEditBtn.addEventListener("click", () => {
         modal.classList.remove("active");
         overlay.classList.remove("active");
       });
 
-      searchInput.addEventListener("input", (e) => {
-        renderNotes(e.target.value.toLowerCase());
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("edit-id").value;
+        const title = document.getElementById("edit-title").value;
+        const description = document.getElementById("edit-description").value;
+        await updateDoc(doc(db, "notes", id), { title, description });
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+        renderNotes();
       });
 
-      deleteAllBtn.addEventListener("click", deleteAllNotes);
+      noteForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        addNote(title, description);
+        noteForm.reset();
+      });
+
+      searchInput.addEventListener("input", (e) => {
+        renderNotes(e.target.value);
+      });
+
+      deleteAllBtn.addEventListener("click", async () => {
+        const batch = writeBatch(db);
+        const notesSnapshot = await getDocs(collection(db, "notes"));
+        notesSnapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+        renderNotes();
+      });
+
+      window.onload = () => {
+        loginModal.classList.add("active");
+        overlay.classList.add("active");
+      };
 
       renderNotes();
     </script>
