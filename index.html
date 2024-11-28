@@ -260,9 +260,8 @@
       }
 
       async function editNote(noteId) {
-        console.log("lucx", noteId);
         const noteRef = doc(db, "notes", noteId);
-        const noteSnapshot = await getDocs(noteRef);
+        const noteSnapshot = await getDoc(noteRef);
         const note = noteSnapshot.data();
         document.getElementById("edit-id").value = noteId;
         document.getElementById("edit-title").value = note.title;
