@@ -191,11 +191,29 @@
             <td>${note.title}</td>
             <td>${note.description}</td>
             <td>
-              <button onclick="editNote('${note.id}')">Editar</button>
-              <button onclick="deleteNote('${note.id}')">Excluir</button>
+              <button class="edit-btn" data-id="${note.id}">Editar</button>
+              <button class="delete-btn" data-id="${note.id}">Excluir</button>
             </td>
           `;
           notesList.appendChild(row);
+        });
+
+        // Add event listeners for edit and delete buttons
+        const editBtns = document.querySelectorAll('.edit-btn');
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+
+        editBtns.forEach(button => {
+          button.addEventListener('click', (e) => {
+            const noteId = e.target.getAttribute('data-id');
+            editNote(noteId);
+          });
+        });
+
+        deleteBtns.forEach(button => {
+          button.addEventListener('click', (e) => {
+            const noteId = e.target.getAttribute('data-id');
+            deleteNote(noteId);
+          });
         });
       }
 
@@ -236,14 +254,13 @@
           overlay.classList.remove('active');
           renderNotes();
         } catch (error) {
-          console.error("Erro ao editar nota: ", error);
+          console.error("Erro ao salvar edição: ", error);
         }
       }
 
       async function deleteNote(noteId) {
-        const noteRef = doc(db, "notes", noteId);
         try {
-          await deleteDoc(noteRef);
+          await deleteDoc(doc(db, "notes", noteId));
           renderNotes();
         } catch (error) {
           console.error("Erro ao excluir nota: ", error);
@@ -252,10 +269,16 @@
 
       async function deleteAllNotes() {
         const notesSnapshot = await getDocs(collection(db, "notes"));
-        notesSnapshot.forEach(async (doc) => {
-          await deleteDoc(doc.ref);
+        const batch = db.batch();
+        notesSnapshot.docs.forEach(doc => {
+          batch.delete(doc.ref);
         });
-        renderNotes();
+        try {
+          await batch.commit();
+          renderNotes();
+        } catch (error) {
+          console.error("Erro ao excluir todas as notas: ", error);
+        }
       }
 
       noteForm.addEventListener('submit', (e) => {
