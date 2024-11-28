@@ -275,14 +275,19 @@
       }
 
       async function editNote(noteId) {
-        const noteRef = doc(db, "notes", noteId);
-        const noteSnapshot = await getDoc(noteRef);
-        const note = noteSnapshot.data();
-        document.getElementById("edit-id").value = noteId;
-        document.getElementById("edit-title").value = note.title;
-        document.getElementById("edit-description").value = note.description;
-        modal.classList.add("active");
-        overlay.classList.add("active");
+        const password = prompt("Digite a senha para editar a nota");
+        if (password === "1234") {
+          const noteRef = doc(db, "notes", noteId);
+          const noteSnapshot = await getDoc(noteRef);
+          const note = noteSnapshot.data();
+          document.getElementById("edit-id").value = noteId;
+          document.getElementById("edit-title").value = note.title;
+          document.getElementById("edit-description").value = note.description;
+          modal.classList.add("active");
+          overlay.classList.add("active");
+        } else {
+          alert("Senha incorreta. A edição não será realizada.");
+        }
       }
 
       async function saveEdit() {
