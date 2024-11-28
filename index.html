@@ -151,10 +151,9 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
-      import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-      // Your web app's Firebase configuration
+      // Configuração do Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyCbHOwmCPDJkoopcN_vHVRLYc7kejmYgTc",
         authDomain: "anotations-4c948.firebaseapp.com",
@@ -165,7 +164,6 @@
         measurementId: "G-52EK5Q3PFF"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
@@ -179,9 +177,15 @@
       const deleteAllBtn = document.getElementById('delete-all-btn');
 
       // Função para renderizar as notas
-      async function renderNotes(filteredNotes = []) {
+      async function renderNotes() {
+        const notesSnapshot = await getDocs(collection(db, "notes"));
+        const notes = notesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
         notesList.innerHTML = '';
-        filteredNotes.forEach((note) => {
+        notes.forEach((note) => {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${note.title}</td>
@@ -201,8 +205,8 @@
         const description = document.getElementById('description').value;
         try {
           await addDoc(collection(db, "notes"), {
-            title: title,
-            description: description,
+            title,
+            description,
           });
           renderNotes();
           noteForm.reset();
@@ -259,30 +263,38 @@
         renderNotes();
       }
 
-      // Event Listeners
+      // Evento de adicionar nota
       noteForm.addEventListener('submit', (e) => {
         e.preventDefault();
         addNote();
       });
 
+      // Evento de salvar edição
       editForm.addEventListener('submit', (e) => {
         e.preventDefault();
         saveEdit();
       });
 
+      // Evento de cancelar edição
       cancelEditBtn.addEventListener('click', () => {
         modal.classList.remove('active');
         overlay.classList.remove('active');
       });
 
-      deleteAllBtn.addEventListener('click', deleteAllNotes);
-
+      // Evento de busca
       searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.toLowerCase();
-        renderNotes(filteredNotes.filter(note => note.title.toLowerCase().includes(searchTerm) || note.description.toLowerCase().includes(searchTerm)));
+        renderNotes(searchTerm);
       });
 
-      // Inicializa a lista de notas
+      // Evento de excluir todas as notas
+      deleteAllBtn.addEventListener('click', () => {
+        if (confirm("Tem certeza que deseja excluir todas as notas?")) {
+          deleteAllNotes();
+        }
+      });
+
+      // Renderiza notas na página inicial
       renderNotes();
     </script>
 </body>
