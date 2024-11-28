@@ -153,7 +153,6 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-      // Configuração do Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyCbHOwmCPDJkoopcN_vHVRLYc7kejmYgTc",
         authDomain: "anotations-4c948.firebaseapp.com",
@@ -176,8 +175,7 @@
       const searchInput = document.getElementById('search-input');
       const deleteAllBtn = document.getElementById('delete-all-btn');
 
-      // Função para renderizar as notas
-      async function renderNotes() {
+      async function renderNotes(searchTerm = '') {
         const notesSnapshot = await getDocs(collection(db, "notes"));
         const notes = notesSnapshot.docs.map(doc => ({
           id: doc.id,
@@ -185,7 +183,9 @@
         }));
 
         notesList.innerHTML = '';
-        notes.forEach((note) => {
+        notes.filter(note => {
+          return note.title.toLowerCase().includes(searchTerm) || note.description.toLowerCase().includes(searchTerm);
+        }).forEach((note) => {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${note.title}</td>
@@ -199,7 +199,6 @@
         });
       }
 
-      // Função para adicionar nota no Firestore
       async function addNote() {
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
@@ -215,7 +214,6 @@
         }
       }
 
-      // Função para editar nota
       async function editNote(noteId) {
         const noteRef = doc(db, "notes", noteId);
         const noteSnapshot = await getDocs(noteRef);
@@ -227,7 +225,6 @@
         overlay.classList.add('active');
       }
 
-      // Função para salvar edição de nota
       async function saveEdit() {
         const noteId = document.getElementById('edit-id').value;
         const title = document.getElementById('edit-title').value;
@@ -243,7 +240,6 @@
         }
       }
 
-      // Função para excluir nota
       async function deleteNote(noteId) {
         const noteRef = doc(db, "notes", noteId);
         try {
@@ -254,7 +250,6 @@
         }
       }
 
-      // Função para excluir todas as notas
       async function deleteAllNotes() {
         const notesSnapshot = await getDocs(collection(db, "notes"));
         notesSnapshot.forEach(async (doc) => {
@@ -263,38 +258,28 @@
         renderNotes();
       }
 
-      // Evento de adicionar nota
       noteForm.addEventListener('submit', (e) => {
         e.preventDefault();
         addNote();
       });
 
-      // Evento de salvar edição
       editForm.addEventListener('submit', (e) => {
         e.preventDefault();
         saveEdit();
       });
 
-      // Evento de cancelar edição
       cancelEditBtn.addEventListener('click', () => {
         modal.classList.remove('active');
         overlay.classList.remove('active');
       });
 
-      // Evento de busca
       searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.toLowerCase();
         renderNotes(searchTerm);
       });
 
-      // Evento de excluir todas as notas
-      deleteAllBtn.addEventListener('click', () => {
-        if (confirm("Tem certeza que deseja excluir todas as notas?")) {
-          deleteAllNotes();
-        }
-      });
+      deleteAllBtn.addEventListener('click', deleteAllNotes);
 
-      // Renderiza notas na página inicial
       renderNotes();
     </script>
 </body>
