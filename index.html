@@ -9,7 +9,113 @@
       rel="stylesheet"
     />
     <style>
-      /* O estilo permanece o mesmo */
+      th {
+        text-align: center;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #007bff;
+        text-align: center;
+      }
+      form {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      input,
+      button {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      table {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        border-collapse: collapse;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      th,
+      td {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        text-align: center;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+      td {
+        background-color: #f8f9fa;
+      }
+      #modal {
+        display: none;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        z-index: 1000;
+      }
+      #modal.active {
+        display: block;
+      }
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 999;
+      }
+      #overlay.active {
+        display: block;
+      }
+      #search {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      #search input {
+        flex-grow: 1;
+      }
+      #delete-all-btn {
+        background-color: #dc3545;
+        border: none;
+        padding: 10px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      #delete-all-btn:hover {
+        background-color: #c82333;
+      }
     </style>
   </head>
   <body>
@@ -64,7 +170,6 @@
         collection,
         addDoc,
         getDocs,
-        getDoc,
         doc,
         deleteDoc,
         updateDoc,
@@ -156,7 +261,7 @@
 
       async function editNote(noteId) {
         const noteRef = doc(db, "notes", noteId);
-        const noteSnapshot = await getDocs(noteRef); // Corrigir de getDocs para getDoc
+        const noteSnapshot = await getDocs(noteRef);
         const note = noteSnapshot.data();
         document.getElementById("edit-id").value = noteId;
         document.getElementById("edit-title").value = note.title;
