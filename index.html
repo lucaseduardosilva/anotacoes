@@ -151,7 +151,7 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyCbHOwmCPDJkoopcN_vHVRLYc7kejmYgTc",
@@ -198,7 +198,6 @@
           notesList.appendChild(row);
         });
 
-        // Add event listeners for edit and delete buttons
         const editBtns = document.querySelectorAll('.edit-btn');
         const deleteBtns = document.querySelectorAll('.delete-btn');
 
@@ -268,8 +267,8 @@
       }
 
       async function deleteAllNotes() {
+        const batch = writeBatch(db);
         const notesSnapshot = await getDocs(collection(db, "notes"));
-        const batch = db.batch();
         notesSnapshot.docs.forEach(doc => {
           batch.delete(doc.ref);
         });
@@ -296,9 +295,8 @@
         overlay.classList.remove('active');
       });
 
-      searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        renderNotes(searchTerm);
+      searchInput.addEventListener('input', (e) => {
+        renderNotes(e.target.value.toLowerCase());
       });
 
       deleteAllBtn.addEventListener('click', deleteAllNotes);
