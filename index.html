@@ -287,25 +287,35 @@
       }
 
       async function deleteNote(noteId) {
-        try {
-          await deleteDoc(doc(db, "notes", noteId));
-          renderNotes();
-        } catch (error) {
-          console.error("Erro ao excluir nota: ", error);
+        const confirmDelete = window.confirm(
+          "Tem certeza que deseja excluir esta nota?"
+        );
+        if (confirmDelete) {
+          try {
+            await deleteDoc(doc(db, "notes", noteId));
+            renderNotes();
+          } catch (error) {
+            console.error("Erro ao excluir nota: ", error);
+          }
         }
       }
 
       async function deleteAllNotes() {
-        const batch = writeBatch(db);
-        const notesSnapshot = await getDocs(collection(db, "notes"));
-        notesSnapshot.docs.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-        try {
-          await batch.commit();
-          renderNotes();
-        } catch (error) {
-          console.error("Erro ao excluir todas as notas: ", error);
+        const confirmDeleteAll = window.confirm(
+          "Tem certeza que deseja excluir todas as notas?"
+        );
+        if (confirmDeleteAll) {
+          const batch = writeBatch(db);
+          const notesSnapshot = await getDocs(collection(db, "notes"));
+          notesSnapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          try {
+            await batch.commit();
+            renderNotes();
+          } catch (error) {
+            console.error("Erro ao excluir todas as notas: ", error);
+          }
         }
       }
 
