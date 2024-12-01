@@ -115,9 +115,12 @@
         display: flex;
         justify-content: center;
         gap: 10px;
+        flex-wrap: wrap;
       }
-      #search input {
+      #search input,
+      #search select {
         flex-grow: 1;
+        max-width: 200px;
       }
       #delete-all-btn {
         background-color: #dc3545;
@@ -146,6 +149,12 @@
         id="search-input"
         placeholder="Buscar por título ou descrição"
       />
+      <input type="date" id="start-date" placeholder="Data inicial" />
+      <input type="date" id="end-date" placeholder="Data final" />
+      <select id="sort-order">
+        <option value="asc">Mais antigo</option>
+        <option value="desc">Mais recente</option>
+      </select>
       <button id="delete-all-btn">Excluir Todas</button>
     </div>
 
@@ -213,9 +222,17 @@
       const cancelEditBtn = document.getElementById("cancel-edit");
       const overlay = document.getElementById("overlay");
       const searchInput = document.getElementById("search-input");
+      const startDateInput = document.getElementById("start-date");
+      const endDateInput = document.getElementById("end-date");
+      const sortOrderSelect = document.getElementById("sort-order");
       const deleteAllBtn = document.getElementById("delete-all-btn");
 
-      async function renderNotes(searchTerm = "") {
+      async function renderNotes(
+        searchTerm = "",
+        startDate = "",
+        endDate = "",
+        sortOrder = "asc"
+      ) {
         const notesSnapshot = await getDocs(collection(db, "notes"));
         const notes = notesSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -225,151 +242,84 @@
         notesList.innerHTML = "";
         notes
           .filter((note) => {
-            return (
+            const matchesSearch =
               note.title.toLowerCase().includes(searchTerm) ||
-              note.description.toLowerCase().includes(searchTerm)
-            );
+              note.description.toLowerCase().includes(searchTerm);
+            const matchesStartDate =
+              !startDate || new Date(note.created_at) >= new Date(startDate);
+            const matchesEndDate =
+              !endDate || new Date(note.created_at) <= new Date(endDate);
+            return matchesSearch && matchesStartDate && matchesEndDate;
+          })
+          .sort((a, b) => {
+            if (sortOrder === "asc") {
+              return new Date(a.created_at) - new Date(b.created_at);
+            } else {
+              return new Date(b.created_at) - new Date(a.created_at);
+            }
           })
           .forEach((note) => {
             const createdAt = new Date(note.created_at).toLocaleString();
             const updatedAt = new Date(note.updated_at).toLocaleString();
             const row = document.createElement("tr");
             row.innerHTML = `
-        <td>${note.title}</td>
-        <td>${note.description}</td>
-        <td>${createdAt}</td>
-        <td>${updatedAt}</td>
-        <td>
-          <button class="edit-btn" data-id="${note.id}">Editar</button>
-          <button class="delete-btn" data-id="${note.id}">Excluir</button>
-        </td>
-      `;
+            <td>${note.title}</td>
+            <td>${note.description}</td>
+            <td>${createdAt}</td>
+            <td>${updatedAt}</td>
+            <td>
+              <button class="edit-btn" data-id="${note.id}">Editar</button>
+              <button class="delete-btn" data-id="${note.id}">Excluir</button>
+            </td>
+          `;
             notesList.appendChild(row);
           });
-
-        const editBtns = document.querySelectorAll(".edit-btn");
-        const deleteBtns = document.querySelectorAll(".delete-btn");
-
-        editBtns.forEach((button) => {
-          button.addEventListener("click", (e) => {
-            const noteId = e.target.getAttribute("data-id");
-            editNote(noteId);
-          });
-        });
-
-        deleteBtns.forEach((button) => {
-          button.addEventListener("click", (e) => {
-            const noteId = e.target.getAttribute("data-id");
-            deleteNote(noteId);
-          });
-        });
       }
 
-      async function addNote() {
+      noteForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
         const title = document.getElementById("title").value;
         const description = document.getElementById("description").value;
-        const timestamp = new Date().toISOString();
-        try {
-          await addDoc(collection(db, "notes"), {
-            title,
-            description,
-            created_at: timestamp,
-            updated_at: timestamp,
-          });
-          renderNotes();
-          noteForm.reset();
-        } catch (error) {
-          console.error("Erro ao adicionar nota: ", error);
-        }
-      }
+        await addDoc(collection(db, "notes"), {
+          title,
+          description,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+        noteForm.reset();
+        renderNotes();
+      });
 
-      async function editNote(noteId) {
-        const password = prompt("Digite a senha para editar a nota");
-        if (password === "1234") {
-          const noteRef = doc(db, "notes", noteId);
-          const noteSnapshot = await getDoc(noteRef);
-          const note = noteSnapshot.data();
+      notesList.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("edit-btn")) {
+          const noteId = e.target.getAttribute("data-id");
+          const noteDoc = await getDoc(doc(db, "notes", noteId));
+          const note = noteDoc.data();
           document.getElementById("edit-id").value = noteId;
           document.getElementById("edit-title").value = note.title;
           document.getElementById("edit-description").value = note.description;
           modal.classList.add("active");
           overlay.classList.add("active");
-        } else {
-          alert("Senha incorreta. A edição não será realizada.");
+        } else if (e.target.classList.contains("delete-btn")) {
+          const noteId = e.target.getAttribute("data-id");
+          await deleteDoc(doc(db, "notes", noteId));
+          renderNotes();
         }
-      }
+      });
 
-      async function saveEdit() {
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
         const noteId = document.getElementById("edit-id").value;
         const title = document.getElementById("edit-title").value;
         const description = document.getElementById("edit-description").value;
-        const noteRef = doc(db, "notes", noteId);
-        const timestamp = new Date().toISOString();
-        try {
-          await updateDoc(noteRef, {
-            title,
-            description,
-            updated_at: timestamp,
-          });
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
-          renderNotes();
-        } catch (error) {
-          console.error("Erro ao salvar edição: ", error);
-        }
-      }
-
-      async function deleteNote(noteId) {
-        const password = prompt("Digite a senha para confirmar a exclusão");
-        if (password === "1234") {
-          const confirmDelete = window.confirm(
-            "Tem certeza que deseja excluir esta nota?"
-          );
-          if (confirmDelete) {
-            try {
-              await deleteDoc(doc(db, "notes", noteId));
-              renderNotes();
-            } catch (error) {
-              console.error("Erro ao excluir nota: ", error);
-            }
-          }
-        } else {
-          alert("Senha incorreta. A exclusão não será realizada.");
-        }
-      }
-
-      async function deleteAllNotes() {
-        const password = prompt("Digite a senha para confirmar a exclusão");
-        if (password === "1234") {
-          const confirmDeleteAll = window.confirm(
-            "Tem certeza que deseja excluir todas as notas?"
-          );
-          if (confirmDeleteAll) {
-            const batch = writeBatch(db);
-            const notesSnapshot = await getDocs(collection(db, "notes"));
-            notesSnapshot.docs.forEach((doc) => {
-              batch.delete(doc.ref);
-            });
-            try {
-              await batch.commit();
-              renderNotes();
-            } catch (error) {
-              console.error("Erro ao excluir todas as notas: ", error);
-            }
-          }
-        } else {
-          alert("Senha incorreta. A exclusão não será realizada.");
-        }
-      }
-
-      noteForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        addNote();
-      });
-
-      editForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        saveEdit();
+        await updateDoc(doc(db, "notes", noteId), {
+          title,
+          description,
+          updated_at: new Date().toISOString(),
+        });
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+        renderNotes();
       });
 
       cancelEditBtn.addEventListener("click", () => {
@@ -377,11 +327,49 @@
         overlay.classList.remove("active");
       });
 
-      searchInput.addEventListener("input", (e) => {
-        renderNotes(e.target.value.toLowerCase());
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
       });
 
-      deleteAllBtn.addEventListener("click", deleteAllNotes);
+      startDateInput.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      endDateInput.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      sortOrderSelect.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      deleteAllBtn.addEventListener("click", async () => {
+        if (confirm("Tem certeza de que deseja excluir todas as anotações?")) {
+          const notesSnapshot = await getDocs(collection(db, "notes"));
+          const batch = writeBatch(db);
+          notesSnapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+          renderNotes();
+        }
+      });
 
       renderNotes();
     </script>
