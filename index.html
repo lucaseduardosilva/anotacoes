@@ -154,6 +154,7 @@
         <tr>
           <th>Título</th>
           <th>Descrição</th>
+          <th>Data de Criação</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -230,9 +231,11 @@
           })
           .forEach((note) => {
             const row = document.createElement("tr");
+            const createdAt = note.created_at.toDate().toLocaleString();
             row.innerHTML = `
             <td>${note.title}</td>
             <td>${note.description}</td>
+            <td>${createdAt}</td>
             <td>
               <button class="edit-btn" data-id="${note.id}">Editar</button>
               <button class="delete-btn" data-id="${note.id}">Excluir</button>
@@ -262,10 +265,12 @@
       async function addNote() {
         const title = document.getElementById("title").value;
         const description = document.getElementById("description").value;
+        const createdAt = new Date();
         try {
           await addDoc(collection(db, "notes"), {
             title,
             description,
+            created_at: createdAt,
           });
           renderNotes();
           noteForm.reset();
