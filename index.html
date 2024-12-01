@@ -154,6 +154,8 @@
         <tr>
           <th>Título</th>
           <th>Descrição</th>
+          <th>Criado em</th>
+          <th>Atualizado em</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -229,15 +231,19 @@
             );
           })
           .forEach((note) => {
+            const createdAt = new Date(note.created_at).toLocaleString();
+            const updatedAt = new Date(note.updated_at).toLocaleString();
             const row = document.createElement("tr");
             row.innerHTML = `
-            <td>${note.title}</td>
-            <td>${note.description}</td>
-            <td>
-              <button class="edit-btn" data-id="${note.id}">Editar</button>
-              <button class="delete-btn" data-id="${note.id}">Excluir</button>
-            </td>
-          `;
+        <td>${note.title}</td>
+        <td>${note.description}</td>
+        <td>${createdAt}</td>
+        <td>${updatedAt}</td>
+        <td>
+          <button class="edit-btn" data-id="${note.id}">Editar</button>
+          <button class="delete-btn" data-id="${note.id}">Excluir</button>
+        </td>
+      `;
             notesList.appendChild(row);
           });
 
@@ -262,10 +268,13 @@
       async function addNote() {
         const title = document.getElementById("title").value;
         const description = document.getElementById("description").value;
+        const timestamp = new Date().toISOString();
         try {
           await addDoc(collection(db, "notes"), {
             title,
             description,
+            created_at: timestamp,
+            updated_at: timestamp,
           });
           renderNotes();
           noteForm.reset();
@@ -295,8 +304,13 @@
         const title = document.getElementById("edit-title").value;
         const description = document.getElementById("edit-description").value;
         const noteRef = doc(db, "notes", noteId);
+        const timestamp = new Date().toISOString();
         try {
-          await updateDoc(noteRef, { title, description });
+          await updateDoc(noteRef, {
+            title,
+            description,
+            updated_at: timestamp,
+          });
           modal.classList.remove("active");
           overlay.classList.remove("active");
           renderNotes();
