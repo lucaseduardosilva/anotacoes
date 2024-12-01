@@ -181,7 +181,9 @@
       label {
         font-size: 12px;
       }
-      .toast {
+      .toast,
+      .toast-delete,
+      .toast-edit {
         position: fixed;
         top: 20px;
         right: 20px;
@@ -197,13 +199,17 @@
         visibility: hidden;
       }
 
-      .toast.show {
+      .toast.show,
+      .toast-delete.show,
+      .toast-edit.show {
         opacity: 1;
         transform: translateY(0);
         visibility: visible;
       }
 
-      .toast.hidden {
+      .toast.hidden,
+      .toast-delete.hidden,
+      .toast-edit.hidden {
         opacity: 0;
         transform: translateY(-20px);
         visibility: hidden;
@@ -316,7 +322,11 @@
       </form>
     </div>
     <div id="overlay2"></div>
-    <div id="toast" class="toast hidden">Salvo com sucesso!</div>
+    <div id="toast" class="toast hidden">Adicionado com sucesso!</div>
+    <div id="toast-edit" class="toast-edit hidden">Editado com sucesso!</div>
+    <div id="toast-delete" class="toast-delete hidden">
+      Excluído com sucesso!
+    </div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -365,6 +375,32 @@
 
       function showToast() {
         const toast = document.getElementById("toast");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
+
+      function showToastEdit() {
+        const toast = document.getElementById("toast-edit");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
+
+      function showToastDelete() {
+        const toast = document.getElementById("toast-delete");
         toast.classList.remove("hidden");
         toast.classList.add("show");
 
@@ -462,6 +498,7 @@
             const noteId = e.target.getAttribute("data-id");
             await deleteDoc(doc(db, "notes", noteId));
             renderNotes();
+            showToastDelete();
           }
         }
       });
@@ -487,7 +524,7 @@
         modal.classList.remove("active");
         overlay.classList.remove("active");
         renderNotes();
-        showToast();
+        showToastEdit();
       });
 
       function clearFormFields() {
@@ -559,6 +596,7 @@
           });
           await batch.commit();
           renderNotes();
+          showToastDelete();
         }
       });
 
