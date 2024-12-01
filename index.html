@@ -35,6 +35,13 @@
         border: 1px solid #ccc;
         border-radius: 5px;
       }
+      .ordenation {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        flex-grow: 1;
+        max-width: 200px;
+      }
       button {
         background-color: #007bff;
         color: white;
@@ -144,11 +151,14 @@
     </form>
 
     <div id="search">
-      <input
-        type="text"
-        id="search-input"
-        placeholder="Buscar por título ou descrição"
-      />
+      <div style="display: flex; flex-direction: column">
+        <label for="search-input">Título / Descrição</label>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Buscar por título ou descrição"
+        />
+      </div>
       <div style="display: flex; flex-direction: column">
         <label for="start-date">Data inicial</label>
         <input type="date" id="start-date" placeholder="Data inicial" />
@@ -157,10 +167,13 @@
         <label for="end-date">Data final</label>
         <input type="date" id="end-date" placeholder="Data final" />
       </div>
-      <select id="sort-order">
-        <option value="asc">Mais antigo</option>
-        <option value="desc">Mais recente</option>
-      </select>
+      <div style="display: flex; flex-direction: column">
+        <label for="sort-order">Ordenação</label>
+        <select id="sort-order">
+          <option value="asc">Mais antigo</option>
+          <option value="desc">Mais recente</option>
+        </select>
+      </div>
       <button id="delete-all-btn">Excluir Todas</button>
     </div>
 
