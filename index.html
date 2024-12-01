@@ -34,7 +34,6 @@
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
-        height: 38px;
       }
       .ordenation {
         padding: 10px;
@@ -137,6 +136,7 @@
         color: white;
         cursor: pointer;
         transition: background-color 0.3s;
+        height: 38px;
       }
       #delete-all-btn:hover {
         background-color: #c82333;
@@ -175,7 +175,10 @@
           <option value="desc">Mais recente</option>
         </select>
       </div>
-      <button id="delete-all-btn">Excluir Todas</button>
+      <div style="display: flex; flex-direction: column">
+        <label style="visibility: hidden">Excluir</label>
+        <button id="delete-all-btn">Excluir Todas</button>
+      </div>
     </div>
 
     <table>
