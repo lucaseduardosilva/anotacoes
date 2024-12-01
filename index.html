@@ -30,7 +30,8 @@
         margin-bottom: 20px;
       }
       input,
-      button {
+      button,
+      textarea {
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
@@ -55,7 +56,7 @@
       }
       table {
         width: 100%;
-        max-width: 800px;
+        max-width: 850px;
         margin: 0 auto;
         border-collapse: collapse;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -89,6 +90,7 @@
         text-overflow: ellipsis;
       }
       #modal {
+        min-width: 500px;
         display: none;
         position: fixed;
         left: 50%;
@@ -116,9 +118,38 @@
       #overlay.active {
         display: block;
       }
+
+      #modal2 {
+        min-width: 500px;
+        display: none;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        z-index: 1000;
+      }
+      #modal2.active {
+        display: block;
+      }
+      #overlay2 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 999;
+      }
+      #overlay2.active {
+        display: block;
+      }
       #search {
         width: 100%;
-        max-width: 800px;
         margin: 0 auto 20px auto;
         display: flex;
         justify-content: center;
@@ -142,6 +173,9 @@
       #delete-all-btn:hover {
         background-color: #c82333;
       }
+      .add-note-btn {
+        height: 38px;
+      }
       label {
         font-size: 12px;
       }
@@ -149,11 +183,6 @@
   </head>
   <body>
     <h1>Anotações</h1>
-    <form id="note-form">
-      <input type="text" id="title" placeholder="Título" required />
-      <input type="text" id="description" placeholder="Descrição" required />
-      <button type="submit">Adicionar</button>
-    </form>
 
     <div id="search">
       <div style="display: flex; flex-direction: column">
@@ -180,6 +209,10 @@
         </select>
       </div>
       <div style="display: flex; flex-direction: column">
+        <label style="visibility: hidden">Adicionar</label>
+        <button id="add-note-btn" class="add-note-btn">Adicionar</button>
+      </div>
+      <div style="display: flex; flex-direction: column">
         <label style="visibility: hidden">Excluir</label>
         <button id="delete-all-btn">Excluir Todas</button>
       </div>
@@ -199,21 +232,61 @@
     </table>
 
     <div id="modal">
-      <h2>Editar Anotação</h2>
-      <form id="edit-form">
+      <div style="width: 100%; display: flex; justify-content: space-between">
+        <h2>Editar Anotação</h2>
+        <span type="button" id="x-cancel-edit" style="cursor: pointer">x</span>
+      </div>
+      <form id="edit-form" style="display: flex; flex-direction: column">
         <input type="hidden" id="edit-id" />
         <input type="text" id="edit-title" placeholder="Título" required />
-        <input
-          type="text"
+        <textarea
           id="edit-description"
           placeholder="Descrição"
           required
-        />
-        <button type="submit">Salvar</button>
-        <button type="button" id="cancel-edit">Cancelar</button>
+          style="height: 100px"
+        ></textarea>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            justify-content: flex-end;
+          "
+        >
+          <button type="button" id="cancel-edit">Cancelar</button>
+          <button type="submit">Salvar</button>
+        </div>
       </form>
     </div>
     <div id="overlay"></div>
+
+    <div id="modal2">
+      <div style="width: 100%; display: flex; justify-content: space-between">
+        <h2>Adicionar Anotação</h2>
+        <span type="button" id="x-cancel-add" style="cursor: pointer">x</span>
+      </div>
+      <form id="note-form" style="display: flex; flex-direction: column">
+        <input type="text" id="title" placeholder="Título" required />
+        <textarea
+          id="description"
+          placeholder="Descrição"
+          required
+          style="height: 100px"
+        ></textarea>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            justify-content: flex-end;
+          "
+        >
+          <button type="button" id="cancel-add">Cancelar</button>
+          <button type="submit">Salvar</button>
+        </div>
+      </form>
+    </div>
+    <div id="overlay2"></div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -245,14 +318,20 @@
       const noteForm = document.getElementById("note-form");
       const notesList = document.getElementById("notes-list");
       const modal = document.getElementById("modal");
+      const modal2 = document.getElementById("modal2");
       const editForm = document.getElementById("edit-form");
       const cancelEditBtn = document.getElementById("cancel-edit");
+      const xCancelEditBtn = document.getElementById("x-cancel-edit");
+      const cancelAddBtn = document.getElementById("cancel-add");
+      const xCancelAddBtn = document.getElementById("x-cancel-add");
       const overlay = document.getElementById("overlay");
+      const overlay2 = document.getElementById("overlay2");
       const searchInput = document.getElementById("search-input");
       const startDateInput = document.getElementById("start-date");
       const endDateInput = document.getElementById("end-date");
       const sortOrderSelect = document.getElementById("sort-order");
       const deleteAllBtn = document.getElementById("delete-all-btn");
+      const addNoteBtn = document.getElementById("add-note-btn");
 
       async function renderNotes(
         searchTerm = "",
@@ -315,6 +394,13 @@
         });
         noteForm.reset();
         renderNotes();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
+      });
+
+      addNoteBtn.addEventListener("click", async (e) => {
+        modal2.classList.add("active");
+        overlay2.classList.add("active");
       });
 
       notesList.addEventListener("click", async (e) => {
@@ -334,6 +420,14 @@
         }
       });
 
+      function updateModalTitle() {
+        const modalTitle = document.getElementById("modal-title");
+        if (isAdd) {
+          modalTitle.textContent = "Adicionar Anotação";
+        } else if (isEdit) {
+          modalTitle.textContent = "Editar Anotação";
+        }
+      }
       editForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const noteId = document.getElementById("edit-id").value;
@@ -349,9 +443,32 @@
         renderNotes();
       });
 
+      function clearFormFields() {
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+      }
+
       cancelEditBtn.addEventListener("click", () => {
+        clearFormFields();
         modal.classList.remove("active");
         overlay.classList.remove("active");
+      });
+      xCancelEditBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+      });
+
+      cancelAddBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
+      });
+
+      xCancelAddBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
       });
 
       searchInput.addEventListener("input", () => {
