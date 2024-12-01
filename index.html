@@ -179,6 +179,33 @@
       label {
         font-size: 12px;
       }
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+        visibility: hidden;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+      }
+
+      .toast.hidden {
+        opacity: 0;
+        transform: translateY(-20px);
+        visibility: hidden;
+      }
     </style>
   </head>
   <body>
@@ -287,6 +314,7 @@
       </form>
     </div>
     <div id="overlay2"></div>
+    <div id="toast" class="toast hidden">Salvo com sucesso!</div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -332,6 +360,19 @@
       const sortOrderSelect = document.getElementById("sort-order");
       const deleteAllBtn = document.getElementById("delete-all-btn");
       const addNoteBtn = document.getElementById("add-note-btn");
+
+      function showToast() {
+        const toast = document.getElementById("toast");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
 
       async function renderNotes(
         searchTerm = "",
@@ -396,6 +437,7 @@
         renderNotes();
         modal2.classList.remove("active");
         overlay2.classList.remove("active");
+        showToast();
       });
 
       addNoteBtn.addEventListener("click", async (e) => {
@@ -414,9 +456,11 @@
           modal.classList.add("active");
           overlay.classList.add("active");
         } else if (e.target.classList.contains("delete-btn")) {
-          const noteId = e.target.getAttribute("data-id");
-          await deleteDoc(doc(db, "notes", noteId));
-          renderNotes();
+          if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
+            const noteId = e.target.getAttribute("data-id");
+            await deleteDoc(doc(db, "notes", noteId));
+            renderNotes();
+          }
         }
       });
 
@@ -441,6 +485,7 @@
         modal.classList.remove("active");
         overlay.classList.remove("active");
         renderNotes();
+        showToast();
       });
 
       function clearFormFields() {
