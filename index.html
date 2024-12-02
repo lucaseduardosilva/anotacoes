@@ -449,7 +449,7 @@
             const row = document.createElement("tr");
             row.innerHTML = `
             <td>${note.title}</td>
-            <td>${note.description.slice(0, 200)}</td>
+            <td>${note.description.length > 200 ? note.description.slice(0, 200) + '...' : note.description}</td>
             <td>${createdAt}</td>
             <td>${updatedAt}</td>
             <td>
