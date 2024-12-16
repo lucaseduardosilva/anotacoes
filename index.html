@@ -358,6 +358,29 @@
         } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { firebaseConfig, senhaCorreta } from "./config.js";
 
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+            e.preventDefault();
+          }
+        });
+
+        document.addEventListener("contextmenu", function (e) {
+          e.preventDefault();
+        });
+
+        setInterval(function () {
+          if (window.innerHeight < 500) {
+            window.resizeTo(window.innerWidth, window.innerHeight);
+          }
+        }, 1000);
+
+        (function () {
+          var original = console.log;
+          console.log = function () {
+            return false;
+          };
+        })();
+
         const firebaseConfigApp = firebaseConfig;
 
         const app = initializeApp(firebaseConfigApp);
