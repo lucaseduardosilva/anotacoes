@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -214,242 +214,270 @@
         transform: translateY(-20px);
         visibility: hidden;
       }
+      #main-container {
+        display: none;
+      }
+      #auth-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
     </style>
   </head>
+
   <body>
-    <h1>Anotações</h1>
+    <div id="main-container">
+      <h1>Anotações</h1>
 
-    <div id="search">
-      <div style="display: flex; flex-direction: column">
-        <label for="search-input">Título / Descrição</label>
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Buscar por título ou descrição"
-        />
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <label for="start-date">Data inicial</label>
-        <input type="date" id="start-date" placeholder="Data inicial" />
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <label for="end-date">Data final</label>
-        <input type="date" id="end-date" placeholder="Data final" />
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <label for="sort-order">Ordenação</label>
-        <select id="sort-order" class="ordenation">
-          <option value="asc">Mais antigo</option>
-          <option value="desc">Mais recente</option>
-        </select>
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <label style="visibility: hidden">Adicionar</label>
-        <button id="add-note-btn" class="add-note-btn">Adicionar</button>
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <label style="visibility: hidden">Excluir</label>
-        <button id="delete-all-btn">Excluir Todas</button>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Descrição</th>
-          <th>Criado em</th>
-          <th>Atualizado em</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="notes-list"></tbody>
-    </table>
-
-    <div id="modal">
-      <div style="width: 100%; display: flex; justify-content: space-between">
-        <h2>Editar Anotação</h2>
-        <span type="button" id="x-cancel-edit" style="cursor: pointer">x</span>
-      </div>
-      <form id="edit-form" style="display: flex; flex-direction: column">
-        <input type="hidden" id="edit-id" />
-        <input type="text" id="edit-title" placeholder="Título" required />
-        <textarea
-          id="edit-description"
-          placeholder="Descrição"
-          required
-          style="height: 100px"
-        ></textarea>
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-            justify-content: flex-end;
-          "
-        >
-          <button type="button" id="cancel-edit">Cancelar</button>
-          <button type="submit">Salvar</button>
+      <div id="search">
+        <div style="display: flex; flex-direction: column">
+          <label for="search-input">Título / Descrição</label>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar por título ou descrição"
+          />
         </div>
-      </form>
-    </div>
-    <div id="overlay"></div>
-
-    <div id="modal2">
-      <div style="width: 100%; display: flex; justify-content: space-between">
-        <h2>Adicionar Anotação</h2>
-        <span type="button" id="x-cancel-add" style="cursor: pointer">x</span>
-      </div>
-      <form id="note-form" style="display: flex; flex-direction: column">
-        <input type="text" id="title" placeholder="Título" required />
-        <textarea
-          id="description"
-          placeholder="Descrição"
-          required
-          style="height: 100px"
-        ></textarea>
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-            justify-content: flex-end;
-          "
-        >
-          <button type="button" id="cancel-add">Cancelar</button>
-          <button type="submit">Salvar</button>
+        <div style="display: flex; flex-direction: column">
+          <label for="start-date">Data inicial</label>
+          <input type="date" id="start-date" placeholder="Data inicial" />
         </div>
-      </form>
-    </div>
-    <div id="overlay2"></div>
-    <div id="toast" class="toast hidden">Adicionado com sucesso!</div>
-    <div id="toast-edit" class="toast-edit hidden">Editado com sucesso!</div>
-    <div id="toast-delete" class="toast-delete hidden">
-      Excluído com sucesso!
-    </div>
+        <div style="display: flex; flex-direction: column">
+          <label for="end-date">Data final</label>
+          <input type="date" id="end-date" placeholder="Data final" />
+        </div>
+        <div style="display: flex; flex-direction: column">
+          <label for="sort-order">Ordenação</label>
+          <select id="sort-order" class="ordenation">
+            <option value="asc">Mais antigo</option>
+            <option value="desc">Mais recente</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column">
+          <label style="visibility: hidden">Adicionar</label>
+          <button id="add-note-btn" class="add-note-btn">Adicionar</button>
+        </div>
+        <div style="display: flex; flex-direction: column">
+          <label style="visibility: hidden">Excluir</label>
+          <button id="delete-all-btn">Excluir Todas</button>
+        </div>
+      </div>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-      import {
-        getFirestore,
-        collection,
-        addDoc,
-        getDocs,
-        getDoc,
-        doc,
-        deleteDoc,
-        updateDoc,
-        writeBatch,
-      } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descrição</th>
+            <th>Criado em</th>
+            <th>Atualizado em</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="notes-list"></tbody>
+      </table>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCbHOwmCPDJkoopcN_vHVRLYc7kejmYgTc",
-        authDomain: "anotations-4c948.firebaseapp.com",
-        projectId: "anotations-4c948",
-        storageBucket: "anotations-4c948.firebasestorage.app",
-        messagingSenderId: "940884295975",
-        appId: "1:940884295975:web:c4cdda7c8cd8ecf868e902",
-        measurementId: "G-52EK5Q3PFF",
-      };
+      <div id="modal">
+        <div style="width: 100%; display: flex; justify-content: space-between">
+          <h2>Editar Anotação</h2>
+          <span type="button" id="x-cancel-edit" style="cursor: pointer"
+            >x</span
+          >
+        </div>
+        <form id="edit-form" style="display: flex; flex-direction: column">
+          <input type="hidden" id="edit-id" />
+          <input type="text" id="edit-title" placeholder="Título" required />
+          <textarea
+            id="edit-description"
+            placeholder="Descrição"
+            required
+            style="height: 100px"
+          ></textarea>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              gap: 8px;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="cancel-edit">Cancelar</button>
+            <button type="submit">Salvar</button>
+          </div>
+        </form>
+      </div>
+      <div id="overlay"></div>
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+      <div id="modal2">
+        <div style="width: 100%; display: flex; justify-content: space-between">
+          <h2>Adicionar Anotação</h2>
+          <span type="button" id="x-cancel-add" style="cursor: pointer">x</span>
+        </div>
+        <form id="note-form" style="display: flex; flex-direction: column">
+          <input type="text" id="title" placeholder="Título" required />
+          <textarea
+            id="description"
+            placeholder="Descrição"
+            required
+            style="height: 100px"
+          ></textarea>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              gap: 8px;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="cancel-add">Cancelar</button>
+            <button type="submit">Salvar</button>
+          </div>
+        </form>
+      </div>
+      <div id="overlay2"></div>
+      <div id="toast" class="toast hidden">Adicionado com sucesso!</div>
+      <div id="toast-edit" class="toast-edit hidden">Editado com sucesso!</div>
+      <div id="toast-delete" class="toast-delete hidden">
+        Excluído com sucesso!
+      </div>
+      <script src="./config.js"></script>
+      <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+          getFirestore,
+          collection,
+          addDoc,
+          getDocs,
+          getDoc,
+          doc,
+          deleteDoc,
+          updateDoc,
+          writeBatch,
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { firebaseConfig, senhaCorreta } from "./config.js";
 
-      const noteForm = document.getElementById("note-form");
-      const notesList = document.getElementById("notes-list");
-      const modal = document.getElementById("modal");
-      const modal2 = document.getElementById("modal2");
-      const editForm = document.getElementById("edit-form");
-      const cancelEditBtn = document.getElementById("cancel-edit");
-      const xCancelEditBtn = document.getElementById("x-cancel-edit");
-      const cancelAddBtn = document.getElementById("cancel-add");
-      const xCancelAddBtn = document.getElementById("x-cancel-add");
-      const overlay = document.getElementById("overlay");
-      const overlay2 = document.getElementById("overlay2");
-      const searchInput = document.getElementById("search-input");
-      const startDateInput = document.getElementById("start-date");
-      const endDateInput = document.getElementById("end-date");
-      const sortOrderSelect = document.getElementById("sort-order");
-      const deleteAllBtn = document.getElementById("delete-all-btn");
-      const addNoteBtn = document.getElementById("add-note-btn");
+        const firebaseConfigApp = firebaseConfig;
 
-      function showToast() {
-        const toast = document.getElementById("toast");
-        toast.classList.remove("hidden");
-        toast.classList.add("show");
+        const app = initializeApp(firebaseConfigApp);
+        const db = getFirestore(app);
 
-        setTimeout(() => {
-          toast.classList.remove("show");
-          setTimeout(() => {
-            toast.classList.add("hidden");
-          }, 500);
-        }, 3000);
-      }
+        const noteForm = document.getElementById("note-form");
+        const notesList = document.getElementById("notes-list");
+        const modal = document.getElementById("modal");
+        const modal2 = document.getElementById("modal2");
+        const editForm = document.getElementById("edit-form");
+        const cancelEditBtn = document.getElementById("cancel-edit");
+        const xCancelEditBtn = document.getElementById("x-cancel-edit");
+        const cancelAddBtn = document.getElementById("cancel-add");
+        const xCancelAddBtn = document.getElementById("x-cancel-add");
+        const overlay = document.getElementById("overlay");
+        const overlay2 = document.getElementById("overlay2");
+        const searchInput = document.getElementById("search-input");
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+        const sortOrderSelect = document.getElementById("sort-order");
+        const deleteAllBtn = document.getElementById("delete-all-btn");
+        const addNoteBtn = document.getElementById("add-note-btn");
+        const passwordInput = document.getElementById("password-input").value;
+        document.getElementById("main-container").classList.add("hidden");
+        document
+          .getElementById("send-password")
+          .addEventListener("click", function () {
+            const senhaInserida =
+              document.getElementById("password-input").value;
+            const senhaCorretaFunction = senhaCorreta;
 
-      function showToastEdit() {
-        const toast = document.getElementById("toast-edit");
-        toast.classList.remove("hidden");
-        toast.classList.add("show");
-
-        setTimeout(() => {
-          toast.classList.remove("show");
-          setTimeout(() => {
-            toast.classList.add("hidden");
-          }, 500);
-        }, 3000);
-      }
-
-      function showToastDelete() {
-        const toast = document.getElementById("toast-delete");
-        toast.classList.remove("hidden");
-        toast.classList.add("show");
-
-        setTimeout(() => {
-          toast.classList.remove("show");
-          setTimeout(() => {
-            toast.classList.add("hidden");
-          }, 500);
-        }, 3000);
-      }
-
-      async function renderNotes(
-        searchTerm = "",
-        startDate = "",
-        endDate = "",
-        sortOrder = "asc"
-      ) {
-        const notesSnapshot = await getDocs(collection(db, "notes"));
-        const notes = notesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        notesList.innerHTML = "";
-        notes
-          .filter((note) => {
-            const matchesSearch =
-              note.title.toLowerCase().includes(searchTerm) ||
-              note.description.toLowerCase().includes(searchTerm);
-            const matchesStartDate =
-              !startDate || new Date(note.created_at) >= new Date(startDate);
-            const matchesEndDate =
-              !endDate || new Date(note.created_at) <= new Date(endDate);
-            return matchesSearch && matchesStartDate && matchesEndDate;
-          })
-          .sort((a, b) => {
-            if (sortOrder === "asc") {
-              return new Date(a.created_at) - new Date(b.created_at);
+            if (senhaInserida === senhaCorretaFunction) {
+              document.getElementById("main-container").style.display = "block";
+              document.getElementById("auth-container").style.display = "none";
             } else {
-              return new Date(b.created_at) - new Date(a.created_at);
+              alert("Senha incorreta");
             }
-          })
-          .forEach((note) => {
-            const createdAt = new Date(note.created_at).toLocaleString();
-            const updatedAt = new Date(note.updated_at).toLocaleString();
-            const row = document.createElement("tr");
-            row.innerHTML = `
+          });
+
+        function showToast() {
+          const toast = document.getElementById("toast");
+          toast.classList.remove("hidden");
+          toast.classList.add("show");
+
+          setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => {
+              toast.classList.add("hidden");
+            }, 500);
+          }, 3000);
+        }
+
+        function showToastEdit() {
+          const toast = document.getElementById("toast-edit");
+          toast.classList.remove("hidden");
+          toast.classList.add("show");
+
+          setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => {
+              toast.classList.add("hidden");
+            }, 500);
+          }, 3000);
+        }
+
+        function showToastDelete() {
+          const toast = document.getElementById("toast-delete");
+          toast.classList.remove("hidden");
+          toast.classList.add("show");
+
+          setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => {
+              toast.classList.add("hidden");
+            }, 500);
+          }, 3000);
+        }
+
+        async function renderNotes(
+          searchTerm = "",
+          startDate = "",
+          endDate = "",
+          sortOrder = "asc"
+        ) {
+          const notesSnapshot = await getDocs(collection(db, "notes"));
+          const notes = notesSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          notesList.innerHTML = "";
+          notes
+            .filter((note) => {
+              const matchesSearch =
+                note.title.toLowerCase().includes(searchTerm) ||
+                note.description.toLowerCase().includes(searchTerm);
+              const matchesStartDate =
+                !startDate || new Date(note.created_at) >= new Date(startDate);
+              const matchesEndDate =
+                !endDate || new Date(note.created_at) <= new Date(endDate);
+              return matchesSearch && matchesStartDate && matchesEndDate;
+            })
+            .sort((a, b) => {
+              if (sortOrder === "asc") {
+                return new Date(a.created_at) - new Date(b.created_at);
+              } else {
+                return new Date(b.created_at) - new Date(a.created_at);
+              }
+            })
+            .forEach((note) => {
+              const createdAt = new Date(note.created_at).toLocaleString();
+              const updatedAt = new Date(note.updated_at).toLocaleString();
+              const row = document.createElement("tr");
+              row.innerHTML = `
             <td>${note.title}</td>
-            <td>${note.description.length > 200 ? note.description.slice(0, 200) + '...' : note.description}</td>
+            <td>${
+              note.description.length > 200
+                ? note.description.slice(0, 200) + "..."
+                : note.description
+            }</td>
             <td>${createdAt}</td>
             <td>${updatedAt}</td>
             <td>
@@ -457,150 +485,163 @@
               <button class="delete-btn" data-id="${note.id}">Excluir</button>
             </td>
           `;
-            notesList.appendChild(row);
+              notesList.appendChild(row);
+            });
+        }
+
+        noteForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const title = document.getElementById("title").value;
+          const description = document.getElementById("description").value;
+          await addDoc(collection(db, "notes"), {
+            title,
+            description,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           });
-      }
-
-      noteForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const title = document.getElementById("title").value;
-        const description = document.getElementById("description").value;
-        await addDoc(collection(db, "notes"), {
-          title,
-          description,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          noteForm.reset();
+          renderNotes();
+          modal2.classList.remove("active");
+          overlay2.classList.remove("active");
+          showToast();
         });
-        noteForm.reset();
-        renderNotes();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-        showToast();
-      });
 
-      addNoteBtn.addEventListener("click", async (e) => {
-        modal2.classList.add("active");
-        overlay2.classList.add("active");
-      });
+        addNoteBtn.addEventListener("click", async (e) => {
+          modal2.classList.add("active");
+          overlay2.classList.add("active");
+        });
 
-      notesList.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("edit-btn")) {
-          const noteId = e.target.getAttribute("data-id");
-          const noteDoc = await getDoc(doc(db, "notes", noteId));
-          const note = noteDoc.data();
-          document.getElementById("edit-id").value = noteId;
-          document.getElementById("edit-title").value = note.title;
-          document.getElementById("edit-description").value = note.description;
-          modal.classList.add("active");
-          overlay.classList.add("active");
-        } else if (e.target.classList.contains("delete-btn")) {
-          if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
+        notesList.addEventListener("click", async (e) => {
+          if (e.target.classList.contains("edit-btn")) {
             const noteId = e.target.getAttribute("data-id");
-            await deleteDoc(doc(db, "notes", noteId));
+            const noteDoc = await getDoc(doc(db, "notes", noteId));
+            const note = noteDoc.data();
+            document.getElementById("edit-id").value = noteId;
+            document.getElementById("edit-title").value = note.title;
+            document.getElementById("edit-description").value =
+              note.description;
+            modal.classList.add("active");
+            overlay.classList.add("active");
+          } else if (e.target.classList.contains("delete-btn")) {
+            if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
+              const noteId = e.target.getAttribute("data-id");
+              await deleteDoc(doc(db, "notes", noteId));
+              renderNotes();
+              showToastDelete();
+            }
+          }
+        });
+
+        function updateModalTitle() {
+          const modalTitle = document.getElementById("modal-title");
+          if (isAdd) {
+            modalTitle.textContent = "Adicionar Anotação";
+          } else if (isEdit) {
+            modalTitle.textContent = "Editar Anotação";
+          }
+        }
+        editForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const noteId = document.getElementById("edit-id").value;
+          const title = document.getElementById("edit-title").value;
+          const description = document.getElementById("edit-description").value;
+          await updateDoc(doc(db, "notes", noteId), {
+            title,
+            description,
+            updated_at: new Date().toISOString(),
+          });
+          modal.classList.remove("active");
+          overlay.classList.remove("active");
+          renderNotes();
+          showToastEdit();
+        });
+
+        function clearFormFields() {
+          document.getElementById("title").value = "";
+          document.getElementById("description").value = "";
+        }
+
+        cancelEditBtn.addEventListener("click", () => {
+          clearFormFields();
+          modal.classList.remove("active");
+          overlay.classList.remove("active");
+        });
+        xCancelEditBtn.addEventListener("click", () => {
+          clearFormFields();
+          modal.classList.remove("active");
+          overlay.classList.remove("active");
+        });
+
+        cancelAddBtn.addEventListener("click", () => {
+          clearFormFields();
+          modal2.classList.remove("active");
+          overlay2.classList.remove("active");
+        });
+
+        xCancelAddBtn.addEventListener("click", () => {
+          clearFormFields();
+          modal2.classList.remove("active");
+          overlay2.classList.remove("active");
+        });
+
+        searchInput.addEventListener("input", () => {
+          const searchTerm = searchInput.value.toLowerCase();
+          const startDate = startDateInput.value;
+          const endDate = endDateInput.value;
+          const sortOrder = sortOrderSelect.value;
+          renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        startDateInput.addEventListener("change", () => {
+          const searchTerm = searchInput.value.toLowerCase();
+          const startDate = startDateInput.value;
+          const endDate = endDateInput.value;
+          const sortOrder = sortOrderSelect.value;
+          renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        endDateInput.addEventListener("change", () => {
+          const searchTerm = searchInput.value.toLowerCase();
+          const startDate = startDateInput.value;
+          const endDate = endDateInput.value;
+          const sortOrder = sortOrderSelect.value;
+          renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        sortOrderSelect.addEventListener("change", () => {
+          const searchTerm = searchInput.value.toLowerCase();
+          const startDate = startDateInput.value;
+          const endDate = endDateInput.value;
+          const sortOrder = sortOrderSelect.value;
+          renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        deleteAllBtn.addEventListener("click", async () => {
+          if (
+            confirm("Tem certeza de que deseja excluir todas as anotações?")
+          ) {
+            const notesSnapshot = await getDocs(collection(db, "notes"));
+            const batch = writeBatch(db);
+            notesSnapshot.forEach((doc) => {
+              batch.delete(doc.ref);
+            });
+            await batch.commit();
             renderNotes();
             showToastDelete();
           }
-        }
-      });
-
-      function updateModalTitle() {
-        const modalTitle = document.getElementById("modal-title");
-        if (isAdd) {
-          modalTitle.textContent = "Adicionar Anotação";
-        } else if (isEdit) {
-          modalTitle.textContent = "Editar Anotação";
-        }
-      }
-      editForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const noteId = document.getElementById("edit-id").value;
-        const title = document.getElementById("edit-title").value;
-        const description = document.getElementById("edit-description").value;
-        await updateDoc(doc(db, "notes", noteId), {
-          title,
-          description,
-          updated_at: new Date().toISOString(),
         });
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
+
         renderNotes();
-        showToastEdit();
-      });
-
-      function clearFormFields() {
-        document.getElementById("title").value = "";
-        document.getElementById("description").value = "";
-      }
-
-      cancelEditBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-      xCancelEditBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-
-      cancelAddBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-      });
-
-      xCancelAddBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-      });
-
-      searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      startDateInput.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      endDateInput.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      sortOrderSelect.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      deleteAllBtn.addEventListener("click", async () => {
-        if (confirm("Tem certeza de que deseja excluir todas as anotações?")) {
-          const notesSnapshot = await getDocs(collection(db, "notes"));
-          const batch = writeBatch(db);
-          notesSnapshot.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
-          await batch.commit();
-          renderNotes();
-          showToastDelete();
-        }
-      });
-
-      renderNotes();
-    </script>
+      </script>
+    </div>
+    <div id="auth-container">
+      <h1>Insira a senha para acessar o sistema</h1>
+      <div style="display: flex; flex-direction: column">
+        <input type="password" id="password-input" />
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <button id="send-password" class="add-note-btn">Enviar</button>
+      </div>
+    </div>
   </body>
 </html>
