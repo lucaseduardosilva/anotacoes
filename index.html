@@ -463,7 +463,7 @@
           searchTerm = "",
           startDate = "",
           endDate = "",
-          sortOrder = "asc"
+          sortOrder = "desc"
         ) {
           const notesSnapshot = await getDocs(collection(db, "notes"));
           const notes = notesSnapshot.docs.map((doc) => ({
