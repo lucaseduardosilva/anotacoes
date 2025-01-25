@@ -91,8 +91,7 @@
       }
       #modal {
         width: 85%;
-        min-width: 500px;
-        height: inherit;
+        max-width: 500px;
         display: none;
         position: fixed;
         left: 50%;
@@ -103,7 +102,9 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         border-radius: 10px;
         z-index: 1000;
-        transition: height 0.3s ease;
+      }
+      #modal.active {
+        display: block;
       }
       #overlay {
         position: fixed;
@@ -121,8 +122,7 @@
 
       #modal2 {
         width: 85%;
-        min-width: 500px;
-        height: inherit;
+        max-width: 500px;
         display: none;
         position: fixed;
         left: 50%;
@@ -133,7 +133,9 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         border-radius: 10px;
         z-index: 1000;
-        transition: height 0.3s ease;
+      }
+      #modal2.active {
+        display: block;
       }
       #overlay2 {
         position: fixed;
@@ -292,7 +294,6 @@
             placeholder="Descrição"
             required
             style="height: 100px"
-            oninput="adjustModalHeight(this.closest('#modal'), this)"
           ></textarea>
           <div
             style="
@@ -321,7 +322,6 @@
             placeholder="Descrição"
             required
             style="height: 100px"
-            oninput="adjustModalHeight(this.closest('#modal2'), this)"
           ></textarea>
           <div
             style="
@@ -459,14 +459,6 @@
           }, 3000);
         }
 
-         function adjustModalHeight(modalElement, textarea) {
-            if(modalElement && textarea) {
-              modalElement.style.height = "auto";
-              modalElement.style.height = modalElement.offsetHeight + "px";
-            }
-        }
-
-
         async function renderNotes(
           searchTerm = "",
           startDate = "",
@@ -502,8 +494,7 @@
               const createdAt = new Date(note.created_at).toLocaleString();
               const updatedAt = new Date(note.updated_at).toLocaleString();
               const row = document.createElement("tr");
-              row.innerHTML =
-                `
+              row.innerHTML = 
             <td>${note.title}</td>
             <td>${
               note.description.length > 200
@@ -516,7 +507,7 @@
               <button class="edit-btn" data-id="${note.id}">Editar</button>
               <button class="delete-btn" data-id="${note.id}">Excluir</button>
             </td>
-          `;
+          ;
               notesList.appendChild(row);
             });
         }
@@ -541,7 +532,6 @@
         addNoteBtn.addEventListener("click", async (e) => {
           modal2.classList.add("active");
           overlay2.classList.add("active");
-          adjustModalHeight(modal2,document.getElementById('description'))
         });
 
         notesList.addEventListener("click", async (e) => {
@@ -555,7 +545,6 @@
               note.description;
             modal.classList.add("active");
             overlay.classList.add("active");
-             adjustModalHeight(modal,document.getElementById('edit-description'))
           } else if (e.target.classList.contains("delete-btn")) {
             if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
               const noteId = e.target.getAttribute("data-id");
