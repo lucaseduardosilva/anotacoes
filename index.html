@@ -225,6 +225,9 @@
         justify-content: center;
         gap: 16px;
       }
+      .hidden {
+        display: none !important;
+      }
     </style>
   </head>
 
@@ -342,159 +345,152 @@
       <div id="toast-delete" class="toast-delete hidden">
         Excluído com sucesso!
       </div>
-      <script src="./config.js"></script>
-      <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import {
-          getFirestore,
-          collection,
-          addDoc,
-          getDocs,
-          getDoc,
-          doc,
-          deleteDoc,
-          updateDoc,
-          writeBatch,
-        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-        import { firebaseConfig, senhaCorreta } from "./config.js";
+    </div>
+    <div id="auth-container">
+      <h1>Insira a senha para acessar o sistema</h1>
+      <div style="display: flex; flex-direction: column">
+        <input type="password" id="password-input" />
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <button id="send-password" class="add-note-btn">Enviar</button>
+      </div>
+    </div>
 
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
-            e.preventDefault();
+    <script type="module">
+      // Import statements removed to simplify the example and remove Firebase dependencies
+
+      // ** IMPORTANT:  REMOVE Firebase if you don't need it.  This is a simplified example **
+      // ** that does NOT use Firebase.  Remove the <script type="module"> tag at the bottom too. **
+
+      // Replace with your actual password
+      const senhaCorreta = "123";
+
+      const noteForm = document.getElementById("note-form");
+      const notesList = document.getElementById("notes-list");
+      const modal = document.getElementById("modal");
+      const modal2 = document.getElementById("modal2");
+      const editForm = document.getElementById("edit-form");
+      const cancelEditBtn = document.getElementById("cancel-edit");
+      const xCancelEditBtn = document.getElementById("x-cancel-edit");
+      const cancelAddBtn = document.getElementById("cancel-add");
+      const xCancelAddBtn = document.getElementById("x-cancel-add");
+      const overlay = document.getElementById("overlay");
+      const overlay2 = document.getElementById("overlay2");
+      const searchInput = document.getElementById("search-input");
+      const startDateInput = document.getElementById("start-date");
+      const endDateInput = document.getElementById("end-date");
+      const sortOrderSelect = document.getElementById("sort-order");
+      const deleteAllBtn = document.getElementById("delete-all-btn");
+      const addNoteBtn = document.getElementById("add-note-btn");
+
+      const mainContainer = document.getElementById("main-container");
+      const authContainer = document.getElementById("auth-container");
+
+      // Authentication Logic
+      document
+        .getElementById("send-password")
+        .addEventListener("click", function () {
+          const senhaInserida =
+            document.getElementById("password-input").value;
+
+          if (senhaInserida === senhaCorreta) {
+            mainContainer.style.display = "block";
+            authContainer.style.display = "none";
+            renderNotes(); // Initial render after authentication
+          } else {
+            alert("Senha incorreta");
           }
         });
 
-        document.addEventListener("contextmenu", function (e) {
-          e.preventDefault();
-        });
+      function showToast() {
+        const toast = document.getElementById("toast");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
 
-        setInterval(function () {
-          if (window.innerHeight < 500) {
-            window.resizeTo(window.innerWidth, window.innerHeight);
-          }
-        }, 1000);
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
 
-        (function () {
-          var original = console.log;
-          console.log = function () {
-            return false;
-          };
-        })();
+      function showToastEdit() {
+        const toast = document.getElementById("toast-edit");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
 
-        const firebaseConfigApp = firebaseConfig;
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
 
-        const app = initializeApp(firebaseConfigApp);
-        const db = getFirestore(app);
+      function showToastDelete() {
+        const toast = document.getElementById("toast-delete");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
 
-        const noteForm = document.getElementById("note-form");
-        const notesList = document.getElementById("notes-list");
-        const modal = document.getElementById("modal");
-        const modal2 = document.getElementById("modal2");
-        const editForm = document.getElementById("edit-form");
-        const cancelEditBtn = document.getElementById("cancel-edit");
-        const xCancelEditBtn = document.getElementById("x-cancel-edit");
-        const cancelAddBtn = document.getElementById("cancel-add");
-        const xCancelAddBtn = document.getElementById("x-cancel-add");
-        const overlay = document.getElementById("overlay");
-        const overlay2 = document.getElementById("overlay2");
-        const searchInput = document.getElementById("search-input");
-        const startDateInput = document.getElementById("start-date");
-        const endDateInput = document.getElementById("end-date");
-        const sortOrderSelect = document.getElementById("sort-order");
-        const deleteAllBtn = document.getElementById("delete-all-btn");
-        const addNoteBtn = document.getElementById("add-note-btn");
-        const passwordInput = document.getElementById("password-input").value;
-        document.getElementById("main-container").classList.add("hidden");
-        document
-          .getElementById("send-password")
-          .addEventListener("click", function () {
-            const senhaInserida =
-              document.getElementById("password-input").value;
-            const senhaCorretaFunction = senhaCorreta;
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 500);
+        }, 3000);
+      }
 
-            if (senhaInserida === senhaCorretaFunction) {
-              document.getElementById("main-container").style.display = "block";
-              document.getElementById("auth-container").style.display = "none";
+      // Fake Data for Example (replace with actual data fetching)
+      let notes = [
+        {
+          id: "1",
+          title: "Grocery List",
+          description: "Milk, Bread, Eggs",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          title: "Meeting Notes",
+          description: "Discuss project timeline",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ];
+
+      function renderNotes(
+        searchTerm = "",
+        startDate = "",
+        endDate = "",
+        sortOrder = "desc"
+      ) {
+        notesList.innerHTML = "";
+
+        const filteredNotes = notes
+          .filter((note) => {
+            const matchesSearch =
+              note.title.toLowerCase().includes(searchTerm) ||
+              note.description.toLowerCase().includes(searchTerm);
+            const matchesStartDate =
+              !startDate || new Date(note.created_at) >= new Date(startDate);
+            const matchesEndDate =
+              !endDate || new Date(note.created_at) <= new Date(endDate);
+            return matchesSearch && matchesStartDate && matchesEndDate;
+          })
+          .sort((a, b) => {
+            if (sortOrder === "asc") {
+              return new Date(a.created_at) - new Date(b.created_at);
             } else {
-              alert("Senha incorreta");
+              return new Date(b.created_at) - new Date(a.created_at);
             }
           });
 
-        function showToast() {
-          const toast = document.getElementById("toast");
-          toast.classList.remove("hidden");
-          toast.classList.add("show");
-
-          setTimeout(() => {
-            toast.classList.remove("show");
-            setTimeout(() => {
-              toast.classList.add("hidden");
-            }, 500);
-          }, 3000);
-        }
-
-        function showToastEdit() {
-          const toast = document.getElementById("toast-edit");
-          toast.classList.remove("hidden");
-          toast.classList.add("show");
-
-          setTimeout(() => {
-            toast.classList.remove("show");
-            setTimeout(() => {
-              toast.classList.add("hidden");
-            }, 500);
-          }, 3000);
-        }
-
-        function showToastDelete() {
-          const toast = document.getElementById("toast-delete");
-          toast.classList.remove("hidden");
-          toast.classList.add("show");
-
-          setTimeout(() => {
-            toast.classList.remove("show");
-            setTimeout(() => {
-              toast.classList.add("hidden");
-            }, 500);
-          }, 3000);
-        }
-
-        async function renderNotes(
-          searchTerm = "",
-          startDate = "",
-          endDate = "",
-          sortOrder = "desc"
-        ) {
-          const notesSnapshot = await getDocs(collection(db, "notes"));
-          const notes = notesSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          notesList.innerHTML = "";
-          notes
-            .filter((note) => {
-              const matchesSearch =
-                note.title.toLowerCase().includes(searchTerm) ||
-                note.description.toLowerCase().includes(searchTerm);
-              const matchesStartDate =
-                !startDate || new Date(note.created_at) >= new Date(startDate);
-              const matchesEndDate =
-                !endDate || new Date(note.created_at) <= new Date(endDate);
-              return matchesSearch && matchesStartDate && matchesEndDate;
-            })
-            .sort((a, b) => {
-              if (sortOrder === "asc") {
-                return new Date(a.created_at) - new Date(b.created_at);
-              } else {
-                return new Date(b.created_at) - new Date(a.created_at);
-              }
-            })
-            .forEach((note) => {
-              const createdAt = new Date(note.created_at).toLocaleString();
-              const updatedAt = new Date(note.updated_at).toLocaleString();
-              const row = document.createElement("tr");
-              row.innerHTML = 
+        filteredNotes.forEach((note) => {
+          const createdAt = new Date(note.created_at).toLocaleString();
+          const updatedAt = new Date(note.updated_at).toLocaleString();
+          const row = document.createElement("tr");
+          row.innerHTML = `
             <td>${note.title}</td>
             <td>${
               note.description.length > 200
@@ -507,164 +503,160 @@
               <button class="edit-btn" data-id="${note.id}">Editar</button>
               <button class="delete-btn" data-id="${note.id}">Excluir</button>
             </td>
-          ;
-              notesList.appendChild(row);
-            });
-        }
-
-        noteForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const title = document.getElementById("title").value;
-          const description = document.getElementById("description").value;
-          await addDoc(collection(db, "notes"), {
-            title,
-            description,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-          noteForm.reset();
-          renderNotes();
-          modal2.classList.remove("active");
-          overlay2.classList.remove("active");
-          showToast();
+          `;
+          notesList.appendChild(row);
         });
+      }
 
-        addNoteBtn.addEventListener("click", async (e) => {
-          modal2.classList.add("active");
-          overlay2.classList.add("active");
-        });
+      noteForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
 
-        notesList.addEventListener("click", async (e) => {
-          if (e.target.classList.contains("edit-btn")) {
-            const noteId = e.target.getAttribute("data-id");
-            const noteDoc = await getDoc(doc(db, "notes", noteId));
-            const note = noteDoc.data();
-            document.getElementById("edit-id").value = noteId;
+        // Create new note (fake id generation)
+        const newNote = {
+          id: Math.random().toString(36).substring(2, 15),
+          title,
+          description,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        notes.push(newNote);
+
+        noteForm.reset();
+        renderNotes();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
+        showToast();
+      });
+
+      addNoteBtn.addEventListener("click", async (e) => {
+        modal2.classList.add("active");
+        overlay2.classList.add("active");
+      });
+
+      notesList.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("edit-btn")) {
+          const noteId = e.target.getAttribute("data-id");
+          const note = notes.find((note) => note.id === noteId); // Find the note
+
+          if (note) {
+            document.getElementById("edit-id").value = note.id;
             document.getElementById("edit-title").value = note.title;
             document.getElementById("edit-description").value =
               note.description;
             modal.classList.add("active");
             overlay.classList.add("active");
-          } else if (e.target.classList.contains("delete-btn")) {
-            if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
-              const noteId = e.target.getAttribute("data-id");
-              await deleteDoc(doc(db, "notes", noteId));
-              renderNotes();
-              showToastDelete();
-            }
           }
-        });
-
-        function updateModalTitle() {
-          const modalTitle = document.getElementById("modal-title");
-          if (isAdd) {
-            modalTitle.textContent = "Adicionar Anotação";
-          } else if (isEdit) {
-            modalTitle.textContent = "Editar Anotação";
-          }
-        }
-        editForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const noteId = document.getElementById("edit-id").value;
-          const title = document.getElementById("edit-title").value;
-          const description = document.getElementById("edit-description").value;
-          await updateDoc(doc(db, "notes", noteId), {
-            title,
-            description,
-            updated_at: new Date().toISOString(),
-          });
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
-          renderNotes();
-          showToastEdit();
-        });
-
-        function clearFormFields() {
-          document.getElementById("title").value = "";
-          document.getElementById("description").value = "";
-        }
-
-        cancelEditBtn.addEventListener("click", () => {
-          clearFormFields();
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
-        });
-        xCancelEditBtn.addEventListener("click", () => {
-          clearFormFields();
-          modal.classList.remove("active");
-          overlay.classList.remove("active");
-        });
-
-        cancelAddBtn.addEventListener("click", () => {
-          clearFormFields();
-          modal2.classList.remove("active");
-          overlay2.classList.remove("active");
-        });
-
-        xCancelAddBtn.addEventListener("click", () => {
-          clearFormFields();
-          modal2.classList.remove("active");
-          overlay2.classList.remove("active");
-        });
-
-        searchInput.addEventListener("input", () => {
-          const searchTerm = searchInput.value.toLowerCase();
-          const startDate = startDateInput.value;
-          const endDate = endDateInput.value;
-          const sortOrder = sortOrderSelect.value;
-          renderNotes(searchTerm, startDate, endDate, sortOrder);
-        });
-
-        startDateInput.addEventListener("change", () => {
-          const searchTerm = searchInput.value.toLowerCase();
-          const startDate = startDateInput.value;
-          const endDate = endDateInput.value;
-          const sortOrder = sortOrderSelect.value;
-          renderNotes(searchTerm, startDate, endDate, sortOrder);
-        });
-
-        endDateInput.addEventListener("change", () => {
-          const searchTerm = searchInput.value.toLowerCase();
-          const startDate = startDateInput.value;
-          const endDate = endDateInput.value;
-          const sortOrder = sortOrderSelect.value;
-          renderNotes(searchTerm, startDate, endDate, sortOrder);
-        });
-
-        sortOrderSelect.addEventListener("change", () => {
-          const searchTerm = searchInput.value.toLowerCase();
-          const startDate = startDateInput.value;
-          const endDate = endDateInput.value;
-          const sortOrder = sortOrderSelect.value;
-          renderNotes(searchTerm, startDate, endDate, sortOrder);
-        });
-
-        deleteAllBtn.addEventListener("click", async () => {
-          if (
-            confirm("Tem certeza de que deseja excluir todas as anotações?")
-          ) {
-            const notesSnapshot = await getDocs(collection(db, "notes"));
-            const batch = writeBatch(db);
-            notesSnapshot.forEach((doc) => {
-              batch.delete(doc.ref);
-            });
-            await batch.commit();
+        } else if (e.target.classList.contains("delete-btn")) {
+          if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
+            const noteId = e.target.getAttribute("data-id");
+            notes = notes.filter((note) => note.id !== noteId); // Remove from notes array
             renderNotes();
             showToastDelete();
           }
-        });
+        }
+      });
 
+      editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const noteId = document.getElementById("edit-id").value;
+        const title = document.getElementById("edit-title").value;
+        const description = document.getElementById("edit-description").value;
+
+        // Find the note index
+        const noteIndex = notes.findIndex((note) => note.id === noteId);
+
+        if (noteIndex !== -1) {
+          //Update the note
+          notes[noteIndex] = {
+            ...notes[noteIndex],
+            title,
+            description,
+            updated_at: new Date().toISOString(),
+          };
+        }
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
         renderNotes();
-      </script>
-    </div>
-    <div id="auth-container">
-      <h1>Insira a senha para acessar o sistema</h1>
-      <div style="display: flex; flex-direction: column">
-        <input type="password" id="password-input" />
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <button id="send-password" class="add-note-btn">Enviar</button>
-      </div>
-    </div>
+        showToastEdit();
+      });
+
+      function clearFormFields() {
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+      }
+
+      cancelEditBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+      });
+      xCancelEditBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal.classList.remove("active");
+        overlay.classList.remove("active");
+      });
+
+      cancelAddBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
+      });
+
+      xCancelAddBtn.addEventListener("click", () => {
+        clearFormFields();
+        modal2.classList.remove("active");
+        overlay2.classList.remove("active");
+      });
+
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      startDateInput.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      endDateInput.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      sortOrderSelect.addEventListener("change", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const sortOrder = sortOrderSelect.value;
+        renderNotes(searchTerm, startDate, endDate, sortOrder);
+      });
+
+      deleteAllBtn.addEventListener("click", async () => {
+        if (
+          confirm("Tem certeza de que deseja excluir todas as anotações?")
+        ) {
+          notes = []; // Clear the notes array
+          renderNotes();
+          showToastDelete();
+        }
+      });
+
+      // renderNotes(); // This will be called after correct password
+
+      // Initial state: Hide the main container
+      mainContainer.style.display = "none";
+    </script>
   </body>
 </html>
