@@ -613,17 +613,32 @@
         });
 
         deleteAllBtn.addEventListener("click", async () => {
-          if (
-            confirm("Tem certeza de que deseja excluir todas as anotações?")
-          ) {
-            const notesSnapshot = await getDocs(collection(db, "notes"));
-            const batch = writeBatch(db);
-            notesSnapshot.forEach((doc) => {
-              batch.delete(doc.ref);
-            });
-            await batch.commit();
-            renderNotes();
-            showToastDelete();
+          const password = prompt("Tem certeza de que deseja excluir todas as anotações?  Digite a senha para confirmar:");
+        
+          if (password === "123") {
+            const confirmed = confirm("Tem certeza ABSOLUTA? Esta ação é irreversível!");
+        
+            if (confirmed) {
+              try {
+                const notesSnapshot = await getDocs(collection(db, "notes"));
+                const batch = writeBatch(db);
+                notesSnapshot.forEach((doc) => {
+                  batch.delete(doc.ref);
+                });
+                await batch.commit();
+                renderNotes();
+                showToastDelete();
+              } catch (error) {
+                console.error("Erro ao excluir as anotações:", error);
+                alert("Ocorreu um erro ao excluir as anotações. Consulte o console para mais detalhes.");
+              }
+            } else {
+              alert("Exclusão cancelada.");
+            }
+          } else if (password !== null) {  
+            alert("Senha incorreta. A exclusão foi cancelada.");
+          } else {
+            alert("Exclusão cancelada."); 
           }
         });
 
