@@ -62,7 +62,7 @@
             gap: 1rem;
         }
 
-        #search>div {
+        #search > div {
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -356,7 +356,7 @@
                 align-items: stretch;
             }
 
-            #search>div {
+            #search > div {
                 max-width: none;
             }
 
@@ -375,7 +375,6 @@
         .table-wrapper {
             max-height: 600px;
             overflow-y: auto;
-            position: relative; /* Necessário para o posicionamento do loading */
         }
 
         .pagination {
@@ -408,39 +407,6 @@
         .button-group {
             display: flex;
             gap: 8px;
-        }
-
-        /* Estilos para o loading */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-        }
-
-        .loading-spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
         }
     </style>
 </head>
@@ -482,10 +448,10 @@
                 <label style="visibility: hidden">Ações</label>
                 <button id="add-note-btn"><i class="fas fa-plus"></i> Adicionar</button>
             </div>
-            <!--             <div>
+            <div>
                 <label style="visibility: hidden">Ações</label>
                 <button id="delete-all-btn"><i class="fas fa-trash"></i> Excluir Todas</button>
-            </div> -->
+            </div>
         </div>
 
         <div class="table-wrapper">
@@ -501,9 +467,6 @@
                 </thead>
                 <tbody id="notes-list"></tbody>
             </table>
-            <div class="loading-overlay" id="loading-overlay">
-                <div class="loading-spinner"></div>
-            </div>
         </div>
 
         <div class="pagination" id="pagination">
@@ -551,9 +514,9 @@
         </div>
     </div>
 
-<!--     <footer>
+    <footer>
         <p>© 2024 Gerenciador de Anotações. Todos os direitos reservados.</p>
-    </footer> -->
+    </footer>
     <script>
         function showToast(toastId) {
             const toast = document.getElementById(toastId);
@@ -602,7 +565,6 @@
         const addNoteBtn = document.getElementById("add-note-btn");
         const paginationDiv = document.getElementById("pagination");
         const rowsPerPageSelect = document.getElementById("rows-per-page");
-        const loadingOverlay = document.getElementById("loading-overlay"); // Elemento do loading
 
         let currentPage = 1;
         let allNotes = [];
@@ -638,55 +600,51 @@
             endDate = "",
             sortOrder = "desc"
         ) {
-            // Mostra o loading
-            loadingOverlay.style.display = "flex";
-
             const searchTermLower = searchTerm.toLowerCase();
             const startDateObj = startDate ? new Date(startDate) : null;
             const endDateObj = endDate ? new Date(endDate) : null;
 
-            try {
-                const notesSnapshot = await getDocs(collection(db, "notes"));
-                allNotes = notesSnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+            const notesSnapshot = await getDocs(collection(db, "notes"));
+            allNotes = notesSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
 
-                const filteredNotes = allNotes.filter((note) => {
-                    const matchesSearch =
-                        note.title.toLowerCase().includes(searchTermLower) ||
-                        note.description.toLowerCase().includes(searchTermLower);
+            const filteredNotes = allNotes.filter((note) => {
+                const matchesSearch =
+                    note.title.toLowerCase().includes(searchTermLower) ||
+                    note.description.toLowerCase().includes(searchTermLower);
 
-                    const matchesStartDate =
-                        !startDateObj || new Date(note.created_at) >= startDateObj;
+                const matchesStartDate =
+                    !startDateObj || new Date(note.created_at) >= startDateObj;
 
-                    const matchesEndDate =
-                        !endDateObj || new Date(note.created_at) <= endDateObj;
+                const matchesEndDate =
+                    !endDateObj || new Date(note.created_at) <= endDateObj;
 
-                    return matchesSearch && matchesStartDate && matchesEndDate;
-                }).sort((a, b) => {
-                    const dateA = new Date(a.created_at);
-                    const dateB = new Date(b.created_at);
+                return matchesSearch && matchesStartDate && matchesEndDate;
+            }).sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
 
-                    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-                });
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            });
 
-                const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
-                renderPaginationButtons(totalPages);
+            const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+            renderPaginationButtons(totalPages);
 
-                const startIndex = (currentPage - 1) * notesPerPage;
-                const endIndex = startIndex + notesPerPage;
-                const notesToDisplay = filteredNotes.slice(startIndex, endIndex);
+            const startIndex = (currentPage - 1) * notesPerPage;
+            const endIndex = startIndex + notesPerPage;
+            const notesToDisplay = filteredNotes.slice(startIndex, endIndex);
 
-                notesList.innerHTML = "";
-                notesToDisplay.forEach((note) => {
-                    const createdAt = new Date(note.created_at).toLocaleString();
-                    const updatedAt = new Date(note.updated_at).toLocaleString();
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
+            notesList.innerHTML = "";
+            notesToDisplay.forEach((note) => {
+                const createdAt = new Date(note.created_at).toLocaleString();
+                const updatedAt = new Date(note.updated_at).toLocaleString();
+                const row = document.createElement("tr");
+                row.innerHTML = `
             <td>${note.title}</td>
             <td>${note.description.length > 100 ? note.description.slice(0, 100) + "..." : note.description
-                        }</td>
+                    }</td>
             <td>${createdAt}</td>
             <td>${updatedAt}</td>
             <td>
@@ -696,12 +654,8 @@
               </div>
             </td>
           `;
-                    notesList.appendChild(row);
-                });
-            } finally {
-                // Esconde o loading
-                loadingOverlay.style.display = "none";
-            }
+                notesList.appendChild(row);
+            });
         }
 
         noteForm.addEventListener("submit", async (e) => {
@@ -871,7 +825,6 @@
             }
         });
 
-        // Chamada inicial para renderizar as notas
         renderNotes();
     </script>
 </body>
