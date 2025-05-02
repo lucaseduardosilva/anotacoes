@@ -39,12 +39,10 @@
         }
 
         #main-container {
-            width: 95%;
-            /* Alterado para 95% para melhor responsividade */
+            width: 90%;
             max-width: 1200px;
             margin: 2rem auto;
-            padding: 1.5rem;
-            /* Reduzido o padding para telas menores */
+            padding: 2rem;
             background-color: var(--table-bg-color);
             box-shadow: 0 5px 15px var(--shadow-color);
             border-radius: 10px;
@@ -60,10 +58,8 @@
             justify-content: space-around;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-            /* Reduzido a margem para telas menores */
-            gap: 0.75rem;
-            /* Reduzido o gap para telas menores */
+            margin-bottom: 2rem;
+            gap: 1rem;
         }
 
         #search > div {
@@ -83,13 +79,11 @@
         input,
         select,
         button {
-            padding: 0.6rem 0.75rem;
-            /* Reduzido o padding para telas menores */
+            padding: 0.75rem 1rem;
             border: 2px solid #ddd;
             border-radius: 7px;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
-            /* Reduzido o tamanho da fonte para telas menores */
+            font-size: 1rem;
         }
 
         input:focus,
@@ -127,22 +121,13 @@
             width: 100%;
             border-collapse: collapse;
             box-shadow: 0 4px 12px var(--shadow-color);
-            margin-bottom: 1rem;
-            /* Adicionado margem inferior para melhor espaçamento */
-            display: block;
-            /* Torna a tabela um bloco para o overflow funcionar */
-            overflow-x: auto;
-            /* Adiciona barra de rolagem horizontal em telas menores */
         }
 
         th,
         td {
             border: 1px solid #ecf0f1;
-            padding: 0.75rem;
-            /* Reduzido o padding para telas menores */
+            padding: 1rem;
             text-align: left;
-            white-space: nowrap;
-            /* Evita que o texto quebre a linha, forçando a rolagem */
         }
 
         th {
@@ -156,10 +141,10 @@
             background-color: #f9f9f9;
         }
 
-        /* td:nth-child(1),
+        td:nth-child(1),
         td:nth-child(2) {
             width: 25%;
-        } */
+        }
 
         td:last-child {
             text-align: center;
@@ -167,15 +152,13 @@
 
         .edit-btn,
         .delete-btn {
-            padding: 0.5rem 0.75rem;
-            /* Reduzido o padding para telas menores */
+            padding: 0.6rem 1rem;
             border: none;
             border-radius: 5px;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.8rem;
-            /* Reduzido o tamanho da fonte para telas menores */
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -183,8 +166,7 @@
 
         .edit-btn {
             background-color: #27ae60;
-            margin-right: 5px;
-            /* Reduzido a margem para telas menores */
+            margin-right: 8px;
         }
 
         .delete-btn {
@@ -209,17 +191,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: var(--table-bg-color);
-            padding: 1.5rem;
-            /* Reduzido o padding para telas menores */
+            padding: 2rem;
             box-shadow: 0 5px 15px var(--shadow-color);
             border-radius: 10px;
             z-index: 1000;
             width: 90%;
             max-width: 600px;
-            max-height: 80%;
-            /* Limita a altura do modal */
-            overflow-y: auto;
-            /* Adiciona barra de rolagem vertical se o conteúdo exceder */
         }
 
         .modal.active,
@@ -247,8 +224,7 @@
         .modal h2,
         .modal2 h2 {
             color: var(--primary-color);
-            margin-bottom: 1rem;
-            /* Reduzido a margem para telas menores */
+            margin-bottom: 1.5rem;
             text-align: center;
         }
 
@@ -256,20 +232,17 @@
         .modal2 form {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            /* Reduzido o gap para telas menores */
+            gap: 1rem;
         }
 
         .modal input,
         .modal textarea,
         .modal2 input,
         .modal2 textarea {
-            padding: 0.6rem;
-            /* Reduzido o padding para telas menores */
+            padding: 0.75rem;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 0.9rem;
-            /* Reduzido o tamanho da fonte para telas menores */
+            font-size: 1rem;
             transition: border-color 0.3s ease;
         }
 
@@ -284,8 +257,7 @@
 
         .modal textarea,
         .modal2 textarea {
-            height: 100px;
-            /* Reduzido a altura para telas menores */
+            height: 120px;
             resize: vertical;
         }
 
@@ -293,16 +265,13 @@
         .modal2 .form-buttons {
             display: flex;
             justify-content: flex-end;
-            gap: 0.5rem;
-            /* Reduzido o gap para telas menores */
-            margin-top: 0.75rem;
-            /* Reduzido a margem para telas menores */
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
         .modal .form-buttons button,
         .modal2 .form-buttons button {
-            padding: 0.6rem 1rem;
-            /* Reduzido o padding para telas menores */
+            padding: 0.75rem 1.25rem;
             border-radius: 7px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
@@ -336,12 +305,9 @@
         .modal .close-modal,
         .modal2 .close-modal {
             position: absolute;
-            top: 0.5rem;
-            /* Reduzido a distância para telas menores */
-            right: 0.5rem;
-            /* Reduzido a distância para telas menores */
-            font-size: 1.2rem;
-            /* Reduzido o tamanho da fonte para telas menores */
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color);
             transition: color 0.3s ease;
@@ -358,11 +324,9 @@
             right: 20px;
             background-color: #2ecc71;
             color: white;
-            padding: 0.75rem 1.5rem;
-            /* Reduzido o padding para telas menores */
+            padding: 1rem 2rem;
             border-radius: 7px;
-            font-size: 0.9rem;
-            /* Reduzido o tamanho da fonte para telas menores */
+            font-size: 1rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             opacity: 0;
             transform: translateX(100%);
@@ -403,14 +367,8 @@
 
             th,
             td {
-                padding: 0.5rem;
-                font-size: 0.8rem;
-            }
-
-            .edit-btn,
-            .delete-btn {
-                font-size: 0.7rem;
-                padding: 0.4rem 0.6rem;
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
 
@@ -448,20 +406,7 @@
 
         .button-group {
             display: flex;
-            gap: 5px;
-            /* Reduzido o gap para telas menores */
-        }
-
-        #loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            font-size: 1.2em;
-            color: var(--primary-color);
-        }
-
-        #loading.show {
-            display: block;
+            gap: 8px;
         }
     </style>
 </head>
@@ -520,10 +465,8 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="notes-list">
-                </tbody>
+                <tbody id="notes-list"></tbody>
             </table>
-            <div id="loading">Carregando...</div>
         </div>
 
         <div class="pagination" id="pagination">
@@ -571,7 +514,7 @@
         </div>
     </div>
 
-    <!--     <footer>
+<!--     <footer>
         <p>© 2024 Gerenciador de Anotações. Todos os direitos reservados.</p>
     </footer> -->
     <script>
@@ -622,7 +565,6 @@
         const addNoteBtn = document.getElementById("add-note-btn");
         const paginationDiv = document.getElementById("pagination");
         const rowsPerPageSelect = document.getElementById("rows-per-page");
-        const loadingDiv = document.getElementById("loading");
 
         let currentPage = 1;
         let allNotes = [];
@@ -658,75 +600,62 @@
             endDate = "",
             sortOrder = "desc"
         ) {
-            loadingDiv.classList.add("show");
-            notesList.innerHTML = "";
-
             const searchTermLower = searchTerm.toLowerCase();
             const startDateObj = startDate ? new Date(startDate) : null;
             const endDateObj = endDate ? new Date(endDate) : null;
 
-            try {
-                const notesSnapshot = await getDocs(collection(db, "notes"));
-                allNotes = notesSnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+            const notesSnapshot = await getDocs(collection(db, "notes"));
+            allNotes = notesSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
 
-                const filteredNotes = allNotes.filter((note) => {
-                    const matchesSearch =
-                        note.title.toLowerCase().includes(searchTermLower) ||
-                        note.description.toLowerCase().includes(searchTermLower);
+            const filteredNotes = allNotes.filter((note) => {
+                const matchesSearch =
+                    note.title.toLowerCase().includes(searchTermLower) ||
+                    note.description.toLowerCase().includes(searchTermLower);
 
-                    const matchesStartDate =
-                        !startDateObj || new Date(note.created_at) >= startDateObj;
+                const matchesStartDate =
+                    !startDateObj || new Date(note.created_at) >= startDateObj;
 
-                    const matchesEndDate =
-                        !endDateObj || new Date(note.created_at) <= endDateObj;
+                const matchesEndDate =
+                    !endDateObj || new Date(note.created_at) <= endDateObj;
 
-                    return matchesSearch && matchesStartDate && matchesEndDate;
-                }).sort((a, b) => {
-                    const dateA = new Date(a.created_at);
-                    const dateB = new Date(b.created_at);
+                return matchesSearch && matchesStartDate && matchesEndDate;
+            }).sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
 
-                    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-                });
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            });
 
-                const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
-                renderPaginationButtons(totalPages);
+            const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+            renderPaginationButtons(totalPages);
 
-                const startIndex = (currentPage - 1) * notesPerPage;
-                const endIndex = startIndex + notesPerPage;
-                const notesToDisplay = filteredNotes.slice(startIndex, endIndex);
+            const startIndex = (currentPage - 1) * notesPerPage;
+            const endIndex = startIndex + notesPerPage;
+            const notesToDisplay = filteredNotes.slice(startIndex, endIndex);
 
-                notesList.innerHTML = "";
-
-                if (notesToDisplay.length === 0) {
-                    loadingDiv.classList.add("show");
-                } else {
-                    loadingDiv.classList.remove("show");
-                    notesToDisplay.forEach((note) => {
-                        const createdAt = new Date(note.created_at).toLocaleString();
-                        const updatedAt = new Date(note.updated_at).toLocaleString();
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                        <td>${note.title}</td>
-                        <td>${note.description.length > 100 ? note.description.slice(0, 100) + "..." : note.description
-                            }</td>
-                        <td>${createdAt}</td>
-                        <td>${updatedAt}</td>
-                        <td>
-                            <div class="button-group">
-                            <button class="edit-btn" data-id="${note.id}"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" data-id="${note.id}"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                        `;
-                        notesList.appendChild(row);
-                    });
-                }
-            } finally {
-                loadingDiv.classList.remove("show");
-            }
+            notesList.innerHTML = "";
+            notesToDisplay.forEach((note) => {
+                const createdAt = new Date(note.created_at).toLocaleString();
+                const updatedAt = new Date(note.updated_at).toLocaleString();
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${note.title}</td>
+            <td>${note.description.length > 100 ? note.description.slice(0, 100) + "..." : note.description
+                    }</td>
+            <td>${createdAt}</td>
+            <td>${updatedAt}</td>
+            <td>
+              <div class="button-group">
+                <button class="edit-btn" data-id="${note.id}"><i class="fas fa-edit"></i></button>
+                <button class="delete-btn" data-id="${note.id}"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          `;
+                notesList.appendChild(row);
+            });
         }
 
         noteForm.addEventListener("submit", async (e) => {
