@@ -1,655 +1,686 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anotações Elegantes</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-      :root {
-        --primary-color: #6c5ce7;
-        --secondary-color: #a29bfe;
-        --text-color: #34495e;
-        --bg-color: #f5f6fa;
-        --table-bg-color: #fff;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        position: relative;
-      }
-
-      h1 {
-        color: var(--primary-color);
-        text-align: center;
-        margin-bottom: 2rem;
-        animation: fadeIn 1s ease-out;
-      }
-
-      #main-container {
-        width: 90%;
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background-color: var(--table-bg-color);
-        box-shadow: 0 5px 15px var(--shadow-color);
-        border-radius: 10px;
-        transition: transform 0.3s ease;
-      }
-
-      #main-container:hover {
-        transform: translateY(-3px);
-      }
-
-      #search {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 2rem;
-        gap: 1rem;
-        animation: slideIn 0.7s ease-out;
-      }
-
-      #search > div {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        min-width: 150px;
-        max-width: 250px;
-      }
-
-      label {
-        font-size: 0.9rem;
-        margin-bottom: 0.3rem;
-        color: var(--secondary-color);
-      }
-
-      input,
-      select,
-      button {
-        padding: 0.75rem 1rem;
-        border: 2px solid #ddd;
-        border-radius: 7px;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-      }
-
-      input:focus,
-      select:focus {
-        border-color: var(--primary-color);
-        outline: none;
-        box-shadow: 0 0 5px rgba(108, 92, 231, 0.3);
-      }
-
-      button {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        border: 2px solid var(--primary-color);
-      }
-
-      button:hover {
-        background-color: #5343c7;
-        transform: translateY(-2px);
-        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15);
-      }
-
-      button:active {
-        transform: translateY(0);
-        box-shadow: none;
-      }
-
-      .ordenation {
-        flex-grow: 1;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        box-shadow: 0 4px 12px var(--shadow-color);
-        animation: growIn 0.8s ease-out;
-      }
-
-      th,
-      td {
-        border: 1px solid #ecf0f1;
-        padding: 1rem;
-        text-align: left;
-      }
-
-      th {
-        background-color: var(--primary-color);
-        color: white;
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-
-      tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
-      }
-
-      td:nth-child(1),
-      td:nth-child(2) {
-        width: 25%;
-      }
-
-      td:last-child {
-        text-align: center;
-      }
-
-      .edit-btn,
-      .delete-btn {
-        padding: 0.6rem 1rem;
-        border: none;
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-      }
-
-      .edit-btn {
-        background-color: #27ae60;
-        margin-right: 0.5rem;
-      }
-
-      .delete-btn {
-        background-color: #e74c3c;
-      }
-
-      .edit-btn:hover {
-        background-color: #219653;
-        transform: scale(1.05);
-      }
-
-      .delete-btn:hover {
-        background-color: #c0392b;
-        transform: scale(1.05);
-      }
-
-      /* Modal Styles */
-      .modal,
-      .modal2 {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: var(--table-bg-color);
-        padding: 2rem;
-        box-shadow: 0 5px 15px var(--shadow-color);
-        border-radius: 10px;
-        z-index: 1000;
-        width: 90%;
-        max-width: 600px;
-        animation: slideIn 0.5s ease-out;
-      }
-
-      .modal.active,
-      .modal2.active {
-        display: block;
-      }
-
-      .overlay,
-      .overlay2 {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        z-index: 999;
-      }
-
-      .overlay.active,
-      .overlay2.active {
-        display: block;
-      }
-
-      .modal h2,
-      .modal2 h2 {
-        color: var(--primary-color);
-        margin-bottom: 1.5rem;
-        text-align: center;
-      }
-
-      .modal form,
-      .modal2 form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .modal input,
-      .modal textarea,
-      .modal2 input,
-      .modal2 textarea {
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-      }
-
-      .modal input:focus,
-      .modal textarea:focus,
-      .modal2 input:focus,
-      .modal2 textarea:focus {
-        border-color: var(--primary-color);
-        outline: none;
-        box-shadow: 0 0 5px rgba(108, 92, 231, 0.3);
-      }
-
-      .modal textarea,
-      .modal2 textarea {
-        height: 120px;
-        resize: vertical;
-      }
-
-      .modal .form-buttons,
-      .modal2 .form-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        margin-top: 1rem;
-      }
-
-      .modal .form-buttons button,
-      .modal2 .form-buttons button {
-        padding: 0.75rem 1.25rem;
-        border-radius: 7px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        border: none;
-      }
-
-      .modal .form-buttons button[type="button"],
-      .modal2 .form-buttons button[type="button"] {
-        background-color: #bdc3c7;
-        color: white;
-      }
-
-      .modal .form-buttons button[type="submit"],
-      .modal2 .form-buttons button[type="submit"] {
-        background-color: var(--primary-color);
-        color: white;
-      }
-
-      .modal .form-buttons button:hover,
-      .modal2 .form-buttons button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15);
-      }
-
-      .modal .form-buttons button:active,
-      .modal2 .form-buttons button:active {
-        transform: translateY(0);
-        box-shadow: none;
-      }
-
-      .modal .close-modal,
-      .modal2 .close-modal {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-color);
-        transition: color 0.3s ease;
-      }
-
-      .modal .close-modal:hover,
-      .modal2 .close-modal:hover {
-        color: var(--primary-color);
-      }
-
-      /* Toast Styles */
-      .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #2ecc71;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 7px;
-        font-size: 1rem;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.4s ease;
-        z-index: 1001;
-      }
-
-      .toast.show {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      /* Animations */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
+        :root {
+            --primary-color: #3498db;
+            --text-color: #2c3e50;
+            --bg-color: #ecf0f1;
+            --table-bg-color: #fff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
 
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateX(-30px);
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
         }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
 
-      @keyframes growIn {
-        from {
-          transform: scale(0.9);
-          opacity: 0;
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out;
         }
-        to {
-          transform: scale(1);
-          opacity: 1;
+
+        #main-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--table-bg-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
         }
-      }
 
-      footer {
-        background-color: var(--primary-color);
-        color: white;
-        text-align: center;
-        padding: 1rem;
-        margin-top: auto;
-        position: sticky;
-        bottom: 0;
-        width: 100%;
-      }
+        #main-container:hover {
+            transform: translateY(-3px);
+        }
 
-      /* Media Queries */
-      @media (max-width: 768px) {
         #search {
-          flex-direction: column;
-          align-items: stretch;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            animation: slideIn 0.7s ease-out;
         }
 
         #search > div {
-          max-width: none;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 150px;
+            max-width: 250px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            color: var(--primary-color);
         }
 
         input,
-        select {
-          width: 100%;
+        select,
+        button {
+            padding: 0.75rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 7px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: 2px solid var(--primary-color);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .ordenation {
+            flex-grow: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            animation: growIn 0.8s ease-out;
         }
 
         th,
         td {
-          padding: 0.75rem;
-          font-size: 0.9rem;
+            border: 1px solid #ecf0f1;
+            padding: 1rem;
+            text-align: left;
         }
-      }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        td:nth-child(1),
+        td:nth-child(2) {
+            width: 25%;
+        }
+
+        td:last-child {
+            text-align: center;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background-color: #27ae60;
+            margin-right: 0.5rem;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+
+        .edit-btn:hover {
+            background-color: #219653;
+            transform: scale(1.05);
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal,
+        .modal2 {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--table-bg-color);
+            padding: 2rem;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border-radius: 10px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .modal.active,
+        .modal2.active {
+            display: block;
+        }
+
+        .overlay,
+        .overlay2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.active,
+        .overlay2.active {
+            display: block;
+        }
+
+        .modal h2,
+        .modal2 h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal form,
+        .modal2 form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal input,
+        .modal textarea,
+        .modal2 input,
+        .modal2 textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal input:focus,
+        .modal textarea:focus,
+        .modal2 input:focus,
+        .modal2 textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .modal textarea,
+        .modal2 textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .modal .form-buttons,
+        .modal2 .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .modal .form-buttons button,
+        .modal2 .form-buttons button {
+            padding: 0.75rem 1.25rem;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+        }
+
+        .modal .form-buttons button[type="button"],
+        .modal2 .form-buttons button[type="button"] {
+            background-color: #bdc3c7;
+            color: white;
+        }
+
+        .modal .form-buttons button[type="submit"],
+        .modal2 .form-buttons button[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal .form-buttons button:hover,
+        .modal2 .form-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal .form-buttons button:active,
+        .modal2 .form-buttons button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .modal .close-modal,
+        .modal2 .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .modal .close-modal:hover,
+        .modal2 .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2ecc71;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 7px;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes growIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            #search {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #search > div {
+                max-width: none;
+            }
+
+            input,
+            select {
+                width: 100%;
+            }
+
+            th,
+            td {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Styles for fixed height table and scroll */
+        .table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="main-container">
-      <h1><i class="fa fa-sticky-note"></i> Anotações</h1>
+        <h1><i class="fa fa-sticky-note"></i> Anotações</h1>
 
-      <div id="search">
-        <div>
-          <label for="search-input"
-            ><i class="fas fa-search"></i> Título / Descrição</label
-          >
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Buscar anotações"
-          />
+        <div id="search">
+            <div>
+                <label for="search-input"><i class="fas fa-search"></i> Título / Descrição</label>
+                <input type="text" id="search-input" placeholder="Buscar anotações" />
+            </div>
+            <div>
+                <label for="start-date"><i class="fas fa-calendar-alt"></i> Data Inicial</label>
+                <input type="date" id="start-date" />
+            </div>
+            <div>
+                <label for="end-date"><i class="fas fa-calendar-alt"></i> Data Final</label>
+                <input type="date" id="end-date" />
+            </div>
+            <div>
+                <label for="sort-order"><i class="fas fa-sort"></i> Ordenação</label>
+                <select id="sort-order" class="ordenation">
+                    <option value="desc">Mais recente</option>
+                    <option value="asc">Mais antigo</option>
+                </select>
+            </div>
+            <div>
+                <label style="visibility: hidden">Ações</label>
+                <button id="add-note-btn"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+            <div>
+                <label style="visibility: hidden">Ações</label>
+                <button id="delete-all-btn"><i class="fas fa-trash"></i> Excluir Todas</button>
+            </div>
         </div>
-        <div>
-          <label for="start-date"><i class="fas fa-calendar-alt"></i> Data
-            Inicial</label>
-          <input type="date" id="start-date" />
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descrição</th>
+                        <th>Criado em</th>
+                        <th>Atualizado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="notes-list"></tbody>
+            </table>
         </div>
-        <div>
-          <label for="end-date"><i class="fas fa-calendar-alt"></i> Data
-            Final</label>
-          <input type="date" id="end-date" />
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
         </div>
-        <div>
-          <label for="sort-order"><i class="fas fa-sort"></i> Ordenação</label>
-          <select id="sort-order" class="ordenation">
-            <option value="desc">Mais recente</option>
-            <option value="asc">Mais antigo</option>
-          </select>
+
+        <div id="modal" class="modal">
+            <span class="close-modal" id="x-cancel-edit">×</span>
+            <h2><i class="fas fa-edit"></i> Editar Anotação</h2>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id" />
+                <input type="text" id="edit-title" placeholder="Título" required />
+                <textarea id="edit-description" placeholder="Descrição" required></textarea>
+                <div class="form-buttons">
+                    <button type="button" id="cancel-edit">Cancelar</button>
+                    <button type="submit">Salvar</button>
+                </div>
+            </form>
         </div>
-        <div>
-          <label style="visibility: hidden">Ações</label>
-          <button id="add-note-btn">
-            <i class="fas fa-plus"></i> Adicionar
-          </button>
+        <div id="overlay" class="overlay"></div>
+
+        <div id="modal2" class="modal2">
+            <span class="close-modal" id="x-cancel-add">×</span>
+            <h2><i class="fas fa-plus"></i> Adicionar Anotação</h2>
+            <form id="note-form">
+                <input type="text" id="title" placeholder="Título" required />
+                <textarea id="description" placeholder="Descrição" required></textarea>
+                <div class="form-buttons">
+                    <button type="button" id="cancel-add">Cancelar</button>
+                    <button type="submit">Salvar</button>
+                </div>
+            </form>
         </div>
-        <div>
-          <label style="visibility: hidden">Ações</label>
-          <button id="delete-all-btn">
-            <i class="fas fa-trash"></i> Excluir Todas
-          </button>
+        <div id="overlay2" class="overlay2"></div>
+
+        <div id="toast" class="toast">
+            <i class="fas fa-check-circle"></i> Anotação salva com sucesso!
         </div>
-      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Descrição</th>
-            <th>Criado em</th>
-            <th>Atualizado em</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="notes-list"></tbody>
-      </table>
+        <div id="toast-edit" class="toast toast">
+            <i class="fas fa-check-circle"></i> Anotação editada com sucesso!
+        </div>
 
-      <div id="modal" class="modal">
-        <span class="close-modal" id="x-cancel-edit">×</span>
-        <h2><i class="fas fa-edit"></i> Editar Anotação</h2>
-        <form id="edit-form">
-          <input type="hidden" id="edit-id" />
-          <input type="text" id="edit-title" placeholder="Título" required />
-          <textarea id="edit-description" placeholder="Descrição" required></textarea>
-          <div class="form-buttons">
-            <button type="button" id="cancel-edit">Cancelar</button>
-            <button type="submit">Salvar</button>
-          </div>
-        </form>
-      </div>
-      <div id="overlay" class="overlay"></div>
-
-      <div id="modal2" class="modal2">
-        <span class="close-modal" id="x-cancel-add">×</span>
-        <h2><i class="fas fa-plus"></i> Adicionar Anotação</h2>
-        <form id="note-form">
-          <input type="text" id="title" placeholder="Título" required />
-          <textarea id="description" placeholder="Descrição" required></textarea>
-          <div class="form-buttons">
-            <button type="button" id="cancel-add">Cancelar</button>
-            <button type="submit">Salvar</button>
-          </div>
-        </form>
-      </div>
-      <div id="overlay2" class="overlay2"></div>
-
-      <div id="toast" class="toast">
-        <i class="fas fa-check-circle"></i> Anotação salva com sucesso!
-      </div>
-
-      <div id="toast-edit" class="toast toast">
-        <i class="fas fa-check-circle"></i> Anotação editada com sucesso!
-      </div>
-
-      <div id="toast-delete" class="toast toast">
-        <i class="fas fa-check-circle"></i> Anotação excluída com sucesso!
-      </div>
+        <div id="toast-delete" class="toast toast">
+            <i class="fas fa-check-circle"></i> Anotação excluída com sucesso!
+        </div>
     </div>
 
     <footer>
-      <p>© 2024 Gerenciador de Anotações. Todos os direitos reservados.</p>
+        <p>© 2024 Gerenciador de Anotações. Todos os direitos reservados.</p>
     </footer>
     <script>
-      // Função para adicionar a classe 'show' e remover após um tempo
-      function showToast(toastId) {
-        const toast = document.getElementById(toastId);
-        toast.classList.add("show");
-        setTimeout(() => {
-          toast.classList.remove("show");
-        }, 3000); // O toast desaparece após 3 segundos
-      }
+        // Função para adicionar a classe 'show' e remover após um tempo
+        function showToast(toastId) {
+            const toast = document.getElementById(toastId);
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000); // O toast desaparece após 3 segundos
+        }
     </script>
     <script src="./config.js"></script>
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-      import {
-        getFirestore,
-        collection,
-        addDoc,
-        getDocs,
-        getDoc,
-        doc,
-        deleteDoc,
-        updateDoc,
-        writeBatch,
-      } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-      import { firebaseConfig } from "./config.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            getDoc,
+            doc,
+            deleteDoc,
+            updateDoc,
+            writeBatch,
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { firebaseConfig } from "./config.js";
 
-      // Restrições de DevTools (Opcional para segurança)
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
-          e.preventDefault();
+        // Inicialização do Firebase
+        const firebaseConfigApp = firebaseConfig;
+        const app = initializeApp(firebaseConfigApp);
+        const db = getFirestore(app);
+
+        // Elementos do DOM
+        const noteForm = document.getElementById("note-form");
+        const notesList = document.getElementById("notes-list");
+        const modal = document.getElementById("modal");
+        const modal2 = document.getElementById("modal2");
+        const editForm = document.getElementById("edit-form");
+        const cancelEditBtn = document.getElementById("cancel-edit");
+        const xCancelEditBtn = document.getElementById("x-cancel-edit");
+        const cancelAddBtn = document.getElementById("cancel-add");
+        const xCancelAddBtn = document.getElementById("x-cancel-add");
+        const overlay = document.getElementById("overlay");
+        const overlay2 = document.getElementById("overlay2");
+        const searchInput = document.getElementById("search-input");
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+        const sortOrderSelect = document.getElementById("sort-order");
+        const deleteAllBtn = document.getElementById("delete-all-btn");
+        const addNoteBtn = document.getElementById("add-note-btn");
+        const paginationDiv = document.getElementById("pagination");
+
+        // Variáveis de paginação
+        const notesPerPage = 5;
+        let currentPage = 1;
+        let allNotes = [];
+
+        // Função para exibir toasts
+        function showToast(toastId) {
+            const toast = document.getElementById(toastId);
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
         }
-      });
 
-      document.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
-      });
-
-      // Ajuste de altura da janela (Opcional)
-      setInterval(function () {
-        if (window.innerHeight < 500) {
-          window.resizeTo(window.innerWidth, window.innerHeight);
-        }
-      }, 1000);
-
-      // Desabilitar console.log (Opcional)
-      (function () {
-        var original = console.log;
-        console.log = function () {
-          return false;
-        };
-      })();
-
-      // Inicialização do Firebase
-      const firebaseConfigApp = firebaseConfig;
-      const app = initializeApp(firebaseConfigApp);
-      const db = getFirestore(app);
-
-      // Elementos do DOM
-      const noteForm = document.getElementById("note-form");
-      const notesList = document.getElementById("notes-list");
-      const modal = document.getElementById("modal");
-      const modal2 = document.getElementById("modal2");
-      const editForm = document.getElementById("edit-form");
-      const cancelEditBtn = document.getElementById("cancel-edit");
-      const xCancelEditBtn = document.getElementById("x-cancel-edit");
-      const cancelAddBtn = document.getElementById("cancel-add");
-      const xCancelAddBtn = document.getElementById("x-cancel-add");
-      const overlay = document.getElementById("overlay");
-      const overlay2 = document.getElementById("overlay2");
-      const searchInput = document.getElementById("search-input");
-      const startDateInput = document.getElementById("start-date");
-      const endDateInput = document.getElementById("end-date");
-      const sortOrderSelect = document.getElementById("sort-order");
-      const deleteAllBtn = document.getElementById("delete-all-btn");
-      const addNoteBtn = document.getElementById("add-note-btn");
-
-      // Função para exibir toasts
-      function showToast(toastId) {
-        const toast = document.getElementById(toastId);
-        toast.classList.add("show");
-        setTimeout(() => {
-          toast.classList.remove("show");
-        }, 3000);
-      }
-
-      // Renderizar as notas na tabela
-      async function renderNotes(
-        searchTerm = "",
-        startDate = "",
-        endDate = "",
-        sortOrder = "desc"
-      ) {
-        const notesSnapshot = await getDocs(collection(db, "notes"));
-        const notes = notesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        notesList.innerHTML = "";
-        notes
-          .filter((note) => {
-            const matchesSearch =
-              note.title.toLowerCase().includes(searchTerm) ||
-              note.description.toLowerCase().includes(searchTerm);
-            const matchesStartDate =
-              !startDate || new Date(note.created_at) >= new Date(startDate);
-            const matchesEndDate =
-              !endDate || new Date(note.created_at) <= new Date(endDate);
-            return matchesSearch && matchesStartDate && matchesEndDate;
-          })
-          .sort((a, b) => {
-            if (sortOrder === "asc") {
-              return new Date(a.created_at) - new Date(b.created_at);
-            } else {
-              return new Date(b.created_at) - new Date(a.created_at);
+        // Função para renderizar os botões de paginação
+        function renderPaginationButtons(totalPages) {
+            paginationDiv.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.innerText = i;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderNotes();
+                });
+                if (i === currentPage) {
+                    button.classList.add("active");
+                }
+                paginationDiv.appendChild(button);
             }
-          })
-          .forEach((note) => {
-            const createdAt = new Date(note.created_at).toLocaleString();
-            const updatedAt = new Date(note.updated_at).toLocaleString();
-            const row = document.createElement("tr");
-            row.innerHTML = `
+        }
+
+        // Renderizar as notas na tabela
+        async function renderNotes(
+            searchTerm = "",
+            startDate = "",
+            endDate = "",
+            sortOrder = "desc"
+        ) {
+            const searchTermLower = searchTerm.toLowerCase();
+            const startDateObj = startDate ? new Date(startDate) : null;
+            const endDateObj = endDate ? new Date(endDate) : null;
+
+            const notesSnapshot = await getDocs(collection(db, "notes"));
+            allNotes = notesSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+
+            const filteredNotes = allNotes.filter((note) => {
+                const matchesSearch =
+                    note.title.toLowerCase().includes(searchTermLower) ||
+                    note.description.toLowerCase().includes(searchTermLower);
+
+                const matchesStartDate =
+                    !startDateObj || new Date(note.created_at) >= startDateObj;
+
+                const matchesEndDate =
+                    !endDateObj || new Date(note.created_at) <= endDateObj;
+
+                return matchesSearch && matchesStartDate && matchesEndDate;
+            }).sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            });
+
+            const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+            renderPaginationButtons(totalPages);
+
+            const startIndex = (currentPage - 1) * notesPerPage;
+            const endIndex = startIndex + notesPerPage;
+            const notesToDisplay = filteredNotes.slice(startIndex, endIndex);
+
+            notesList.innerHTML = "";
+            notesToDisplay.forEach((note) => {
+                const createdAt = new Date(note.created_at).toLocaleString();
+                const updatedAt = new Date(note.updated_at).toLocaleString();
+                const row = document.createElement("tr");
+                row.innerHTML = `
             <td>${note.title}</td>
-            <td>${
-              note.description.length > 200
-                ? note.description.slice(0, 200) + "..."
-                : note.description
-            }</td>
+            <td>${note.description.length > 200 ? note.description.slice(0, 200) + "..." : note.description
+                    }</td>
             <td>${createdAt}</td>
             <td>${updatedAt}</td>
             <td>
@@ -657,175 +688,183 @@
               <button class="delete-btn" data-id="${note.id}"><i class="fas fa-trash"></i> Excluir</button>
             </td>
           `;
-            notesList.appendChild(row);
-          });
-      }
+                notesList.appendChild(row);
+            });
+        }
 
-      // Lidar com o envio do formulário de adição de nota
-      noteForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const title = document.getElementById("title").value;
-        const description = document.getElementById("description").value;
-        await addDoc(collection(db, "notes"), {
-          title,
-          description,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        noteForm.reset();
-        renderNotes();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-        showToast("toast");
-      });
-
-      // Abrir o modal de adição de nota
-      addNoteBtn.addEventListener("click", async (e) => {
-        modal2.classList.add("active");
-        overlay2.classList.add("active");
-      });
-
-      // Lidar com cliques na lista de notas (editar e excluir)
-      notesList.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("edit-btn")) {
-          const noteId = e.target.getAttribute("data-id");
-          const noteDoc = await getDoc(doc(db, "notes", noteId));
-          const note = noteDoc.data();
-          document.getElementById("edit-id").value = noteId;
-          document.getElementById("edit-title").value = note.title;
-          document.getElementById("edit-description").value = note.description;
-          modal.classList.add("active");
-          overlay.classList.add("active");
-        } else if (e.target.classList.contains("delete-btn")) {
-          if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
-            const noteId = e.target.getAttribute("data-id");
-            await deleteDoc(doc(db, "notes", noteId));
+        // Lidar com o envio do formulário de adição de nota
+        noteForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            await addDoc(collection(db, "notes"), {
+                title,
+                description,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            });
+            noteForm.reset();
+            currentPage = 1; // Reset to first page after adding a note
             renderNotes();
-            showToast("toast-delete");
-          }
-        }
-      });
-
-      // Lidar com o envio do formulário de edição de nota
-      editForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const noteId = document.getElementById("edit-id").value;
-        const title = document.getElementById("edit-title").value;
-        const description = document.getElementById("edit-description").value;
-        await updateDoc(doc(db, "notes", noteId), {
-          title,
-          description,
-          updated_at: new Date().toISOString(),
+            modal2.classList.remove("active");
+            overlay2.classList.remove("active");
+            showToast("toast");
         });
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-        renderNotes();
-        showToast("toast-edit");
-      });
 
-      // Limpar os campos do formulário
-      function clearFormFields() {
-        document.getElementById("title").value = "";
-        document.getElementById("description").value = "";
-      }
+        // Abrir o modal de adição de nota
+        addNoteBtn.addEventListener("click", async (e) => {
+            modal2.classList.add("active");
+            overlay2.classList.add("active");
+        });
 
-      // Cancelar a edição de nota
-      cancelEditBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-      xCancelEditBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-
-      // Cancelar a adição de nota
-      cancelAddBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-      });
-
-      xCancelAddBtn.addEventListener("click", () => {
-        clearFormFields();
-        modal2.classList.remove("active");
-        overlay2.classList.remove("active");
-      });
-
-      // Lidar com as mudanças nos campos de pesquisa
-      searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      startDateInput.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      endDateInput.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      sortOrderSelect.addEventListener("change", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        const sortOrder = sortOrderSelect.value;
-        renderNotes(searchTerm, startDate, endDate, sortOrder);
-      });
-
-      // Excluir todas as notas
-      deleteAllBtn.addEventListener("click", async () => {
-        const password = prompt(
-          "Tem certeza de que deseja excluir todas as anotações?  Digite a senha para confirmar:"
-        );
-
-        if (password === "123") {
-          const confirmed = confirm(
-            "Tem certeza ABSOLUTA? Esta ação é irreversível!"
-          );
-
-          if (confirmed) {
-            try {
-              const notesSnapshot = await getDocs(collection(db, "notes"));
-              const batch = writeBatch(db);
-              notesSnapshot.forEach((doc) => {
-                batch.delete(doc.ref);
-              });
-              await batch.commit();
-              renderNotes();
-              showToast("toast-delete");
-            } catch (error) {
-              console.error("Erro ao excluir as anotações:", error);
-              alert(
-                "Ocorreu um erro ao excluir as anotações. Consulte o console para mais detalhes."
-              );
+        // Lidar com cliques na lista de notas (editar e excluir)
+        notesList.addEventListener("click", async (e) => {
+            if (e.target.classList.contains("edit-btn")) {
+                const noteId = e.target.getAttribute("data-id");
+                const noteDoc = await getDoc(doc(db, "notes", noteId));
+                const note = noteDoc.data();
+                document.getElementById("edit-id").value = noteId;
+                document.getElementById("edit-title").value = note.title;
+                document.getElementById("edit-description").value = note.description;
+                modal.classList.add("active");
+                overlay.classList.add("active");
+            } else if (e.target.classList.contains("delete-btn")) {
+                if (confirm("Tem certeza de que deseja excluir essa anotação?")) {
+                    const noteId = e.target.getAttribute("data-id");
+                    await deleteDoc(doc(db, "notes", noteId));
+                    currentPage = 1; // Reset to first page after deleting a note
+                    renderNotes();
+                    showToast("toast-delete");
+                }
             }
-          } else {
-            alert("Exclusão cancelada.");
-          }
-        } else if (password !== null) {
-          alert("Senha incorreta. A exclusão foi cancelada.");
-        } else {
-          alert("Exclusão cancelada.");
-        }
-      });
+        });
 
-      // Renderizar as notas iniciais
-      renderNotes();
+        // Lidar com o envio do formulário de edição de nota
+        editForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const noteId = document.getElementById("edit-id").value;
+            const title = document.getElementById("edit-title").value;
+            const description = document.getElementById("edit-description").value;
+            await updateDoc(doc(db, "notes", noteId), {
+                title,
+                description,
+                updated_at: new Date().toISOString(),
+            });
+            modal.classList.remove("active");
+            overlay.classList.remove("active");
+            renderNotes();
+            showToast("toast-edit");
+        });
+
+        // Limpar os campos do formulário
+        function clearFormFields() {
+            document.getElementById("title").value = "";
+            document.getElementById("description").value = "";
+        }
+
+        // Cancelar a edição de nota
+        cancelEditBtn.addEventListener("click", () => {
+            clearFormFields();
+            modal.classList.remove("active");
+            overlay.classList.remove("active");
+        });
+        xCancelEditBtn.addEventListener("click", () => {
+            clearFormFields();
+            modal.classList.remove("active");
+            overlay.classList.remove("active");
+        });
+
+        // Cancelar a adição de nota
+        cancelAddBtn.addEventListener("click", () => {
+            clearFormFields();
+            modal2.classList.remove("active");
+            overlay2.classList.remove("active");
+        });
+
+        xCancelAddBtn.addEventListener("click", () => {
+            clearFormFields();
+            modal2.classList.remove("active");
+            overlay2.classList.remove("active");
+        });
+
+        // Lidar com as mudanças nos campos de pesquisa
+        searchInput.addEventListener("input", () => {
+            currentPage = 1;
+            const searchTerm = searchInput.value.toLowerCase();
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const sortOrder = sortOrderSelect.value;
+            renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        startDateInput.addEventListener("change", () => {
+            currentPage = 1;
+            const searchTerm = searchInput.value.toLowerCase();
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const sortOrder = sortOrderSelect.value;
+            renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        endDateInput.addEventListener("change", () => {
+            currentPage = 1;
+            const searchTerm = searchInput.value.toLowerCase();
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const sortOrder = sortOrderSelect.value;
+            renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        sortOrderSelect.addEventListener("change", () => {
+            currentPage = 1;
+            const searchTerm = searchInput.value.toLowerCase();
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const sortOrder = sortOrderSelect.value;
+            renderNotes(searchTerm, startDate, endDate, sortOrder);
+        });
+
+        // Excluir todas as notas
+        deleteAllBtn.addEventListener("click", async () => {
+            const password = prompt(
+                "Tem certeza de que deseja excluir todas as anotações?  Digite a senha para confirmar:"
+            );
+
+            if (password === "123") {
+                const confirmed = confirm(
+                    "Tem certeza ABSOLUTA? Esta ação é irreversível!"
+                );
+
+                if (confirmed) {
+                    try {
+                        const notesSnapshot = await getDocs(collection(db, "notes"));
+                        const batch = writeBatch(db);
+                        notesSnapshot.forEach((doc) => {
+                            batch.delete(doc.ref);
+                        });
+                        await batch.commit();
+                        currentPage = 1; // Reset to first page after deleting all notes
+                        renderNotes();
+                        showToast("toast-delete");
+                    } catch (error) {
+                        console.error("Erro ao excluir as anotações:", error);
+                        alert(
+                            "Ocorreu um erro ao excluir as anotações. Consulte o console para mais detalhes."
+                        );
+                    }
+                } else {
+                    alert("Exclusão cancelada.");
+                }
+            } else if (password !== null) {
+                alert("Senha incorreta. A exclusão foi cancelada.");
+            } else {
+                alert("Exclusão cancelada.");
+            }
+        });
+
+        // Renderizar as notas iniciais
+        renderNotes();
     </script>
-  </body>
+</body>
+
 </html>
